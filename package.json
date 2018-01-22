@@ -5,6 +5,8 @@
   "homepage": "https://dai.makerdao.com",
   "dependencies": {
     "create-react-class": "^15.5.3",
+    "eslint": "^2.0.0",
+    "eslint-config-react-app": "^2.1.0",
     "gulp-gh-pages": "^0.5.4",
     "gulp-surge": "^0.1.0",
     "import": "0.0.6",
@@ -20,7 +22,7 @@
     "gh-pages": "^0.12.0",
     "gulp": "^3.9.1",
     "gulp-sync": "^0.1.4",
-    "react-scripts": "1.0.0"
+    "react-scripts": "^1.0.0"
   },
   "scripts": {
     "start": "react-scripts start",

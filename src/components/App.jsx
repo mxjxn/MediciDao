@@ -10,6 +10,7 @@ import GeneralInfo from './GeneralInfo';
 import TokenAllowance from './TokenAllowance';
 import PriceChart from './PriceChart';
 import SystemStatus from './SystemStatus';
+import BankStatus from './BankStatus';
 import Cups from './Cups';
 import Wrap from './Wrap';
 import Transfer from './Transfer';
@@ -2249,6 +2250,28 @@ class App extends Component {
               {/* <Token system={ this.state.system } network={ this.state.network.network } account={ this.state.network.defaultAccount } token='sin' color='bg-red' /> */}
             </div>
             <div className="row">
+            <div className="col-md-9">
+              {
+                settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
+                ? <PriceChart chartData={ this.state.system.chartData } />
+                : ''
+              }
+              <BankStatus system={ this.state.system } actions={ bustBoomActions } handleOpenModal={ this.handleOpenModal } service={ settings.chain[this.state.network.network].service } stats={ this.state.system.stats } />
+              {
+                web3.isAddress(this.state.network.defaultAccount)
+                ?
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Wrap wrapUnwrap={ this.wrapUnwrap } accountBalance={ this.state.profile.accountBalance } system={ this.state.system } />
+                    </div>
+                    <div className="col-md-6">
+                      <Transfer transferToken={ this.transferToken } system={ this.state.system } profile={ this.state.profile } network={ this.state.network.network } account={ this.state.network.defaultAccount } />
+                    </div>
+                  </div>
+                :
+                  ''
+              }
+            </div>
               <div className="col-md-9">
                 {
                   settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
