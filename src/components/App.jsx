@@ -2271,38 +2271,6 @@ class App extends Component {
                 :
                   ''
               }
-            </div>
-              <div className="col-md-9">
-                {
-                  settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
-                  ? <PriceChart chartData={ this.state.system.chartData } />
-                  : ''
-                }
-                <SystemStatus system={ this.state.system } actions={ bustBoomActions } handleOpenModal={ this.handleOpenModal } service={ settings.chain[this.state.network.network].service } stats={ this.state.system.stats } />
-                {
-                  web3.isAddress(this.state.network.defaultAccount)
-                  ?
-                    <div className="row">
-                      <div className="col-md-6">
-                        <Wrap wrapUnwrap={ this.wrapUnwrap } accountBalance={ this.state.profile.accountBalance } system={ this.state.system } />
-                      </div>
-                      <div className="col-md-6">
-                        <Transfer transferToken={ this.transferToken } system={ this.state.system } profile={ this.state.profile } network={ this.state.network.network } account={ this.state.network.defaultAccount } />
-                      </div>
-                    </div>
-                  :
-                    ''
-                }
-                <Cups system={ this.state.system } network={ this.state.network.network } profile={ this.state.profile.activeProfile } handleOpenModal={ this.handleOpenModal } handleOpenCupHistoryModal={ this.handleOpenCupHistoryModal } listCups={ this.listCups } moveCupsPage={ this.moveCupsPage } tab={ this.tab } rap={ this.rap } />
-                <div className="row">
-                  <div className="col-md-12">
-                    {
-                      openAction.active
-                      ? <a className="buttonAction openAction" title={ openAction.helper } href="#action" data-method="open" onClick={ this.handleOpenModal } ><span data-method="open">{ openAction.display }</span></a>
-                      : <span className="buttonAction openAction" title={ openAction.helper }><span>{ openAction.display }</span></span>
-                    }
-                  </div>
-                </div>
               </div>
               <div className="col-md-3 right-sidebar">
                 {/* <div className="box">
