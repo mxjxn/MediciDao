@@ -7,7 +7,7 @@ const Token = (props) => {
   // const totalSupply = props.token === 'dai' || props.token === 'sin' ? token.totalSupply.add(props.system.sin.issuerFee) : token.totalSupply;
   // const tapBalance = props.token === 'dai' ? token.tapBalance.add(props.system.sin.issuerFee) : token.tapBalance;
   // const tubBalance = props.token === 'sin' ? token.tubBalance.add(props.system.sin.issuerFee) : token.tubBalance;
-  const name = props.token.replace('gem', 'yom').replace('gov', 'med').replace('skr', 'IOU');
+  const name = props.token.replace('gem', 'cdo').replace('gov', 'med').replace('skr', 'flr');
   const totalSupply = token.totalSupply;
   const tapBalance = token.tapBalance;
   const tubBalance = token.tubBalance;
@@ -102,11 +102,11 @@ const Token = (props) => {
             props.actions &&
             <div>
               {
-                Object.keys(props.actions).map(key =>
-                  props.actions[key].active
-                  ? <a key={ key } className="buttonAction" title={ props.actions[key].helper } href="#action" data-method={ key } onClick={ props.handleOpenModal } ><span data-method={ key }>{ props.actions[key].display }</span></a>
-                  : <span key={ key } className="buttonAction" title={ props.actions[key].helper }><span>{ props.actions[key].display }</span></span>
-                )
+                // Object.keys(props.actions).map(key =>
+                //   props.actions[key].active
+                //   ? <a key={ key } className="buttonAction" title={ props.actions[key].helper } href="#action" data-method={ key } onClick={ props.handleOpenModal } ><span data-method={ key }>{ props.actions[key].display }</span></a>
+                //   : <span key={ key } className="buttonAction" title={ props.actions[key].helper }><span>{ props.actions[key].display }</span></span>
+                // )
               }
             </div>
           }

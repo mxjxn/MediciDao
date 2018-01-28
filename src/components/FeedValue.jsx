@@ -70,39 +70,7 @@ class FeedValue extends React.Component {
   render() {
     return(
       <div className="box">
-        <div className="box-header with-border">
-          <h3 className="box-title">{ this.props.currency } Price Feed</h3>
-        </div>
-        <div className="box-body">
-          <div className="row">
-            <div className="col-md-12">
-              <div>
-                <p>
-                  Current Value:&nbsp;
-                  <strong>
-                    <AnimatedNumber
-                    value={ this.props.val }
-                    title={ formatNumber(this.props.val) }
-                    formatValue={ n => formatNumber(n, 3) }
-                    className="printedNumber"
-                    onClick = { copyToClipboard } />
-                  </strong> USD/{ this.props.currency }
-                </p>
-                {/* {
-                  this.state.last
-                  ?
-                    <p>
-                      Minimum Valid Sources: <strong>{ this.state.min }</strong> - Total: <strong>{ this.state.values.filter(x => x !== "0x0000000000000000000000000000000000000000").length }</strong>
-                    </p>
-                  :
-                    ''
-                }
-                { this.state.values.filter(x => x !== "0x0000000000000000000000000000000000000000").map(x => <DSValue key={ x } address={ x } />) } */}
-                <a target="_blank" rel="noopener noreferrer" href={ `http://makerdao.com/feeds/#${this.props.address}` }>View More</a>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
     );
   }

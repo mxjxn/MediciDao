@@ -59,10 +59,9 @@ class Transfer extends Component {
                 <form className="transfer" ref={(input) => this.transferForm = input} onSubmit={(e) => this.transfer(e)}>
                   <label>Token</label>
                   <select ref={(input) => this.token = input} >
-                    <option value="gem">WETH</option>
-                    <option value="gov">MKR</option>
-                    <option value="dai">DAI</option>
-                    <option value="skr">PETH</option>
+                    <option value="gem">Florin</option>
+                    <option value="gov">MED</option>
+                    <option value="dai">Dai</option>
                   </select>
                   {
                     settings.chain[this.props.network].proxyFactory

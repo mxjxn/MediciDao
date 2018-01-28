@@ -45,7 +45,7 @@ class BankStatus extends Component {
                   </span>
                 </div>
                 <div>
-                  <strong>System Collateralization</strong>
+                  <strong>Available Liquidity</strong>
                   <span>
                     {
                       this.props.system.gem.tubBalance.gte(0) && this.props.system.pip.val.gte(0) && this.props.system.dai.totalSupply.gte(0) && this.props.system.vox.par.gte(0)
@@ -66,7 +66,7 @@ class BankStatus extends Component {
                   </span>
                 </div>
                 <div>
-                  <strong title="Percentage number of maximum DAI already issued">Debt Ceiling Ratio</strong>
+                  <strong title="Percentage number of maximum DAI already issued">Interest Rate</strong>
                   {
                     this.props.system.dai.totalSupply.gte(0) && this.props.system.tub.cap.gte(0)
                     ?
@@ -76,7 +76,7 @@ class BankStatus extends Component {
                   }
                 </div>
                 <div>
-                  <strong title="Amount of collateral pool ETH claimed by 1 PETH">PETH/ETH</strong>
+                  <strong title="Amount of collateral pool ETH claimed by 1 PETH">Florin/ Total CDO Supply</strong>
                   {
                     this.props.system.tub.per.gte(0)
                     ?
@@ -86,56 +86,16 @@ class BankStatus extends Component {
                   }
                 </div>
                 <div>
-                  <strong>Total Liquidity Available from forced CDP liquidations</strong>
-                  <span className="boom-bust">
+                  <strong>Claim Period</strong>
+                  <span className={ this.props.system.tub.off === true ? 'error-color' : 'success-color' }>
                     {
-                      this.props.system.tub.off === -1
+                      this.props.system.tub.off !== -1
                       ?
-                        'Loading...'
+                        this.props.system.tub.off === false ? 'Active' : 'Inactive'
                       :
-                        this.props.system.tub.off === false
-                        ?
-                          this.props.system.tub.avail_bust_skr.gte(0) && this.props.system.tub.avail_bust_dai.gte(0)
-                          ?
-                            <span>
-                              Sell { printNumber(this.props.system.tub.avail_bust_dai) } DAI<br />
-                              Buy { printNumber(this.props.system.tub.avail_bust_skr) } PETH
-                            </span>
-                          :
-                            'Loading...'
-                        :
-                          '-'
+                        'Loading...'
                     }
                   </span>
-                  <span className="boom-bust">
-                    {
-                      this.props.system.tub.off === -1
-                      ?
-                        'Loading...'
-                      :
-                        this.props.system.tub.off === false
-                        ?
-                          this.props.system.tub.avail_boom_skr.gte(0) && this.props.system.tub.avail_boom_dai.gte(0)
-                          ?
-                            <span>
-                              Sell { printNumber(this.props.system.tub.avail_boom_skr) } PETH<br />
-                              Buy { printNumber(this.props.system.tub.avail_boom_dai) } DAI
-                            </span>
-                          :
-                            'Loading...'
-                        :
-                          '-'
-                    }
-                  </span>
-                  <div style={ {marginLeft: '8px'} }>
-                    {
-                      Object.keys(this.props.actions).map(key =>
-                        this.props.actions[key].active
-                        ? <a key={ key } className="buttonAction" href="#action" data-method={ key } onClick={ this.props.handleOpenModal } ><span data-method={ key }>{ this.props.actions[key].display }</span></a>
-                        : <span key={ key } className="buttonAction" ><span>{ this.props.actions[key].display }</span></span>
-                      )
-                    }
-                  </div>
                 </div>
               </div>
               <div className="more" style={ {display: this.state.viewMore ? 'block' : 'none'} }>

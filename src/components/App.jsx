@@ -2218,7 +2218,7 @@ class App extends Component {
       <div className="content-wrapper">
         <section className="content-header">
           <h1>
-            <a href="/" className="logo"><img src={ logo } alt="Maker Dai Explorer" width="50" /> - DAI Explorer</a>
+            <a href="/" className="logo"><img src={ "https://pbs.twimg.com/profile_images/947320958439907328/Z4_kzyML_400x400.jpg" } alt="Maker Dai Explorer" width="50" /> - Medici DAO Bank</a>
           </h1>
           {
             settings.chain[this.state.network.network].proxyFactory
@@ -2294,26 +2294,7 @@ class App extends Component {
                     </div>
                   </div>
                 </div> */}
-                <a className="resource buy-dai" href="https://oasisdex.com/#trade/W-ETH/DAI" target="_blank" rel="noopener noreferrer" >
-                  <span>Buy DAI</span>
-                </a>
-                {
-                  this.state.network.defaultAccount &&
-                  <TokenAllowance system={ this.state.system } mode={ this.state.profile.mode } approve={ this.approve } approveAll={ this.approveAll } />
-                }
-                {
-                  this.state.system.pip.address && this.state.network.network !== 'private' &&
-                  <FeedValue address={ this.state.system.pip.address } val={ this.state.system.pip.val } currency="ETH" />
-                }
-                {
-                  this.state.system.pep.address && this.state.network.network !== 'private' &&
-                  <FeedValue address={ this.state.system.pep.address } val={ this.state.system.pep.val } currency="MKR" />
-                }
-                <ResourceButtons handleOpenVideoModal={ this.handleOpenVideoModal } handleOpenTerminologyModal={ this.handleOpenTerminologyModal } />
-                <div>
-                  <a href="#action" onClick={this.handleOpenTermsModal} data-modal="announcement">Dai Public Announcement</a><br />
-                  <a href="#action" onClick={this.handleOpenTermsModal} data-modal="terms">Dai Terms of Service</a>
-                </div>
+                
               </div>
             </div>
           </div>
