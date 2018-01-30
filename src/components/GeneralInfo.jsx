@@ -52,8 +52,8 @@ class GeneralInfo extends Component {
               </a>
               <div id="collapseAddresses" className="panel-collapse collapse" aria-expanded="false" style={{ height: "0px" }}>
                 <div><strong>Dai:</strong> { etherscanAddress(this.props.network, this.props.dai, this.props.dai) }</div>
-                <div><strong>Florin:</strong> { etherscanAddress(this.props.network, this.props.top, this.props.top) }</div>
-                <div><strong>Medici:</strong> { etherscanAddress(this.props.network, this.props.tub, this.props.tub) }</div>
+                <div><strong>BankDai:</strong> { etherscanAddress(this.props.network, this.props.bankDai, this.props.bankDai) }</div>
+                <div><strong>BankDaiToken:</strong> { etherscanAddress(this.props.network, this.props.bankDaiToken, this.props.bankDaiToken) }</div>
               </div>
             </div>
             {/* <div className="col-md-6">
