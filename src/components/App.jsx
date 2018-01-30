@@ -24,6 +24,9 @@ import './App.css';
 
 const settings = require('../settings');
 
+const bankDai = require('../abi/bankdai.json');
+const daiToken = require('../abi/daitoken.json');
+const bankDaiToken = require('../abi/bankDaiToken.json');
 const tub = require('../abi/saitub');
 const top = require('../abi/saitop');
 const tap = require('../abi/saitap');
@@ -105,6 +108,15 @@ class App extends Component {
         top: {
           address: null,
         },
+        bankDai: {
+          address: "0xA3A391e69ac6ca112eedFe5bD892133d3eaFec41"
+        },
+        daiToken: {
+          address: "0xf14adA897252D9B3F89c10910f885dFec4bFEba9"
+        },
+        bankDaiToken: {
+          address: "0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D"
+        }, 
         tap: {
           address: null,
           fix: web3.toBigNumber(-1),
@@ -219,6 +231,8 @@ class App extends Component {
                   break;
                 case '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3':
                   network = 'main';
+                case '0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d':
+                  network = 'ropsten';
                   break;
                 default:
                   console.log('setting network to private');
@@ -308,8 +322,8 @@ class App extends Component {
     return web3.isAddress(topAddress);
   }
 
-  initContracts = topAddress => {
-    if (!this.validateAddresses(topAddress)) {
+  initContracts = (bankDaiAddress, tokenAddress, bankTokenAddress) => {
+    if (!this.validateAddresses(bankDaiAddress) || !this.validateAddresses(tokenAddress) || !this.validateAddresses(bankTokenAddress)) {
       return;
     }
     web3.reset(true);
@@ -319,64 +333,68 @@ class App extends Component {
     this.setState((prevState, props) => {
       return { system: {...initialState}.system };
     }, () => {
-      window.topObj = this.topObj = this.loadObject(top.abi, topAddress);
+      /* window.topObj = this.topObj = this.loadObject(top.abi, topAddress);*/
+      window.bankDaiObj = this.bankDaiObj = this.loadObject(bankDai.abi, bankDaiAddress);
+      window.daiTokenObj = this.daiTokenObj = this.loadObject(daiToken.abi, tokenAddress);
+      window.bankTokenObj = this.bankTokenObj = this.loadObject(bankDaiToken.abi, bankTokenAddress);
+
       const addrs = settings.chain[this.state.network.network];
 
-      const setUpPromises = [this.getTubAddress(), this.getTapAddress()];
-      if (addrs.proxyFactory) {
-        window.proxyFactoryObj = this.proxyFactoryObj = this.loadObject(dsproxyfactory.abi, addrs.proxyFactory);
-        setUpPromises.push(this.getProxyAddress());
-      }
-      Promise.all(setUpPromises).then(r => {
-        if (r[0] && r[1] && web3.isAddress(r[0]) && web3.isAddress(r[1])) {
-          window.tubObj = this.tubObj = this.loadObject(tub.abi, r[0]);
-          window.tapObj = this.tapObj = this.loadObject(tap.abi, r[1]);
-          const system = { ...this.state.system };
-          const profile = { ...this.state.profile };
+      // const setUpPromises = [this.getTubAddress(), this.getTapAddress()];
+      /* if (addrs.proxyFactory) {
+       *    window.proxyFactoryObj = this.proxyFactoryObj = this.loadObject(dsproxyfactory.abi, addrs.proxyFactory);
+       *    setUpPromises.push(this.getProxyAddress());
+       *  }*/
+      /* Promise.all(setUpPromises).then(r => {
+       *   if (r[0] && r[1] && web3.isAddress(r[0]) && web3.isAddress(r[1])) {
+       *     window.tubObj = this.tubObj = this.loadObject(tub.abi, r[0]);
+       *     window.tapObj = this.tapObj = this.loadObject(tap.abi, r[1]);
+       *     const system = { ...this.state.system };
+       *     const profile = { ...this.state.profile };
 
-          system.top.address = topAddress;
-          system.tub.address = r[0];
-          system.tap.address = r[1];
+       *     system.top.address = topAddress;
+       *     system.tub.address = r[0];
+       *     system.tap.address = r[1];
 
-          if (addrs.proxyFactory && r[2]) {
-            profile.proxy = r[2];
-            profile.activeProfile = localStorage.getItem('mode') === 'proxy' ? profile.proxy : this.state.network.defaultAccount;
-            window.proxyObj = this.proxyObj = this.loadObject(dsproxy.abi, profile.proxy);
-          } else {
-            profile.activeProfile = this.state.network.defaultAccount;
-            profile.mode = 'account';
-            localStorage.setItem('mode', 'account');
-          }
+       *     if (addrs.proxyFactory && r[2]) {
+       *       profile.proxy = r[2];
+       *       profile.activeProfile = localStorage.getItem('mode') === 'proxy' ? profile.proxy : this.state.network.defaultAccount;
+       *       window.proxyObj = this.proxyObj = this.loadObject(dsproxy.abi, profile.proxy);
+       *     } else {
+       *       profile.activeProfile = this.state.network.defaultAccount;
+       *       profile.mode = 'account';
+       *       localStorage.setItem('mode', 'account');
+       *     }
 
-          this.setState({ system, profile }, () => {
-            const promises = [this.setUpVox(), this.setUpPit()];
-            Promise.all(promises).then(r => {
-              this.initializeSystemStatus();
+       *     this.setState({ system, profile }, () => {
+       *       const promises = [this.setUpVox(), this.setUpPit()];
+       *       Promise.all(promises).then(r => {
+       *         this.initializeSystemStatus();
 
-              this.setUpToken('gem');
-              this.setUpToken('gov');
-              this.setUpToken('skr');
-              this.setUpToken('dai');
-              this.setUpToken('sin');
+       *         this.setUpToken('gem');
+       *         this.setUpToken('gov');
+       *         this.setUpToken('skr');
+       *         this.setUpToken('dai');
+       *         this.setUpToken('sin');
 
-              this.getCups(settings['CDPsPerPage']);
+       *         this.getCups(settings['CDPsPerPage']);
 
-              this.setFiltersTub();
-              this.setFiltersTap();
-              this.setFiltersVox();
-              this.setFilterFeedValue('pip');
-              this.setFilterFeedValue('pep');
-              this.setTimeVariablesInterval();
-              this.setNonTimeVariablesInterval();
+       *         this.setFiltersTub();
+       *         this.setFiltersTap();
+       *         this.setFiltersVox();
+       *         this.setFilterFeedValue('pip');
+       *         this.setFilterFeedValue('pep');
+       *         this.setTimeVariablesInterval();
+       *         this.setNonTimeVariablesInterval();
 
-              // This is necessary to finish transactions that failed after signing
-              this.setPendingTxInterval();
-            });
-          });
-        } else {
-          alert('This is not a Top address');
-        }
-      });
+       *         // This is necessary to finish transactions that failed after signing
+       *         this.setPendingTxInterval();
+       *       });
+       *     });
+       *   } else {
+       *     alert('This is not a Top address');
+       *   }
+       * });*/
     });
   }
 
@@ -455,8 +473,9 @@ class App extends Component {
 
   getTubAddress = () => {
     const p = new Promise((resolve, reject) => {
-      this.topObj.tub.call((e, r) => {
+      this.topObj.name.call((e, r) => {
         if (!e) {
+          this.state.system.dai.address = r;
           resolve(r);
         } else {
           reject(e);

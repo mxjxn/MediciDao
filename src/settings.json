@@ -40,6 +40,30 @@
         "customActions": "",
         "tokenActions": ""
       }
+    },
+    "ropsten": {
+      "top": "0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D",
+      "fromBlock":  2547103,
+      "BankDai": {
+        "address":"0xA3A391e69ac6ca112eedFe5bD892133d3eaFec41",
+        "fromBlock":2547068
+      },
+      "DSTokenBase":{
+        "address":"0xf14adA897252D9B3F89c10910f885dFec4bFEba9",
+        "fromBlock":2547092
+      },
+      "BankDaiToken":{
+        "address":"0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D",
+        "fromBlock":2547103
+      },
+      "service": "",
+      "chart": false,
+      "proxyFactory": "",
+      "proxyContracts": {
+        "basicActions": "",
+        "customActions": "",
+        "tokenActions": ""
+      }
     }
   }
 }
