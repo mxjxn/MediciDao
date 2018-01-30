@@ -2249,8 +2249,8 @@ class App extends Component {
               </div>
             </div>
             <div className="row">
-              <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='gem' color='' off={this.state.system.tub.off} />
-              <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='gov' color='' off={this.state.system.tub.off} />
+              {/* <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='gem' color='' off={this.state.system.tub.off} />
+                  <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='gov' color='' off={this.state.system.tub.off} /> */}
               <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='skr' color='bg-aqua' actions={skrActions} handleOpenModal={this.handleOpenModal} />
               <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='dai' color='bg-green' actions={daiActions} handleOpenModal={this.handleOpenModal} />
               {/* <Token system={ this.state.system } network={ this.state.network.network } account={ this.state.network.defaultAccount } token='sin' color='bg-red' /> */}
