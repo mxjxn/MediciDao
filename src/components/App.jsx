@@ -472,9 +472,11 @@ class App extends Component {
     }, 10000);
   }
 
+
+  //approve()
   getAccountBalance = () => {
     if (web3.isAddress(this.state.profile.activeProfile)) {
-      web3.eth.getBalance(this.state.profile.activeProfile, (e, r) => {
+      this.daiTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
         if (!e) {
           const profile = { ...this.state.profile };
           profile.accountBalance = r;
@@ -635,7 +637,6 @@ class App extends Component {
           let bankDai = system.bankDai;
           bankDai.myBalance = r;
           this.setState({system}, function(){
-            // alert('balance: '+this.state.system.bankDai.myBalance);
           })
         }
       });
