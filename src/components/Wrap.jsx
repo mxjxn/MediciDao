@@ -7,7 +7,7 @@ class Wrap extends Component {
     error: ''
   };
 
-  wrapUnwrap = (e) => {
+  depositWithdraw = (e) => {
     e.preventDefault();
     const operation = this.operation.value;
     const amount = this.amount.value
@@ -15,10 +15,10 @@ class Wrap extends Component {
 
     if (!amount) {
       this.setState({ error: 'Invalid Amount' });
-    } else if (operation === 'wrap' && this.props.accountBalance.lt(web3.toWei(amount))) {
-      this.setState({ error: `Not enough balance to wrap ${amount} ETH` });
-    } else if (operation === 'unwrap' && this.props.system.gem.myBalance.lt(web3.toWei(amount))) {
-      this.setState({ error: `Not enough balance to unwrap ${amount} WETH` });
+    } else if (operation === 'deposit' && this.props.accountBalance.lt(web3.toWei(amount))) {
+      this.setState({ error: `Not enough balance to deposit ${amount} DAI` });
+    } else if (operation === 'withdraw' && this.props.system.bankDai.myBalance.lt(web3.toWei(amount))) {
+      this.setState({ error: `Not enough balance to withdraw ${amount} DAI-B` });
     } else {
       this.props.wrapUnwrap(operation, amount);
       this.amount.value = '';
@@ -43,7 +43,7 @@ class Wrap extends Component {
           <div className="row">
             <div className="col-md-12">
               <div>
-                <form className="transfer" ref={(input) => this.wrapUnwrapForm = input} onSubmit={(e) => this.wrapUnwrap(e)}>
+                <form className="transfer" ref={(input) => this.wrapUnwrapForm = input} onSubmit={(e) => this.depositWithdraw(e)}>
                   <p>
                     <strong>Dai Balance</strong> <span>{ this.props.accountBalance.gte(0) ? printNumber(this.props.accountBalance) : 'Loading...' }</span>
                   </p>
@@ -52,8 +52,8 @@ class Wrap extends Component {
                   </p>
                   <label>Operation</label>
                   <select ref={(input) => this.operation = input} >
-                    <option value="wrap">Deposit</option>
-                    <option value="unwrap">Withdraw</option>
+                    <option value="deposit">Deposit</option>
+                    <option value="withdraw">Withdraw</option>
                   </select>
                   <label>Amount</label>
                   <input ref={(input) => this.amount = input} type="number" placeholder="0.00" step="0.000000000000000001" />

@@ -341,7 +341,7 @@ class App extends Component {
       /* window.topObj = this.topObj = this.loadObject(top.abi, topAddress);*/
       window.bankDaiObj = this.bankDaiObj = this.loadObject(bankDai.abi, bankDaiAddress);
       window.daiTokenObj = this.daiTokenObj = this.loadObject(daiToken.abi, tokenAddress);
-      window.bankTokenObj = this.bankTokenObj = this.loadObject(bankDaiToken.abi, bankTokenAddress);
+      window.bankDaiTokenObj = this.bankDaiTokenObj = this.loadObject(bankDaiToken.abi, bankTokenAddress);
 
       const profile = { ...this.state.profile };
       profile.mode = 'account';
@@ -354,6 +354,11 @@ class App extends Component {
         this.getBankDaiTotalSupply();
         this.getDaiTokenBalance();
         this.getDaiTokenTotalSupply();
+        this.setTimeVariablesInterval();
+        this.setNonTimeVariablesInterval();
+
+        // This is necessary to finish transactions that failed after signing
+        this.setPendingTxInterval();
       })
 
       // const addrs = settings.chain[this.state.network.network];
@@ -436,10 +441,10 @@ class App extends Component {
 
   setTimeVariablesInterval = () => {
     this.timeVariablesInterval = setInterval(() => {
-      this.getParameterFromTub('chi', true);
-      this.getParameterFromTub('rhi', true);
-      this.getParameterFromVox('par', true);
-      this.loadEraRho();
+      // this.getParameterFromTub('chi', true);
+      // this.getParameterFromTub('rhi', true);
+      // this.getParameterFromVox('par', true);
+      // this.loadEraRho();
       this.getAccountBalance();
     }, 5000);
   }
@@ -447,29 +452,30 @@ class App extends Component {
   setNonTimeVariablesInterval = () => {
     // This interval should not be necessary if we can rely on the events
     this.timeVariablesInterval = setInterval(() => {
-      this.setUpToken('gem');
-      this.setUpToken('gov');
-      this.setUpToken('skr');
-      this.setUpToken('dai');
-      this.setUpToken('sin');
-      this.getParameterFromTub('authority');
-      this.getParameterFromTub('off');
-      this.getParameterFromTub('out');
-      this.getParameterFromTub('axe', true);
-      this.getParameterFromTub('mat', true, this.calculateSafetyAndDeficit);
-      this.getParameterFromTub('cap');
-      this.getParameterFromTub('fit');
-      this.getParameterFromTub('tax', true);
-      this.getParameterFromTub('fee', true);
-      this.getParameterFromTub('chi', true);
-      this.getParameterFromTub('rhi', true);
-      this.getParameterFromTub('per', true);
-      this.getParameterFromTub('gap');
-      this.getParameterFromTub('tag', true, this.calculateSafetyAndDeficit);
-      this.getParameterFromTap('fix', true);
-      this.getParameterFromTap('gap', false, this.getBoomBustValues);
-      this.getParameterFromVox('way', true);
-      this.getParameterFromVox('par', true);
+      this.setUpToken('daiToken');
+      this.setUpToken('bankDaiToken');
+      // this.setUpToken('gov');
+      // this.setUpToken('skr');
+      // this.setUpToken('dai');
+      // this.setUpToken('sin');
+      // this.getParameterFromTub('authority');
+      // this.getParameterFromTub('off');
+      // this.getParameterFromTub('out');
+      // this.getParameterFromTub('axe', true);
+      // this.getParameterFromTub('mat', true, this.calculateSafetyAndDeficit);
+      // this.getParameterFromTub('cap');
+      // this.getParameterFromTub('fit');
+      // this.getParameterFromTub('tax', true);
+      // this.getParameterFromTub('fee', true);
+      // this.getParameterFromTub('chi', true);
+      // this.getParameterFromTub('rhi', true);
+      // this.getParameterFromTub('per', true);
+      // this.getParameterFromTub('gap');
+      // this.getParameterFromTub('tag', true, this.calculateSafetyAndDeficit);
+      // this.getParameterFromTap('fix', true);
+      // this.getParameterFromTap('gap', false, this.getBoomBustValues);
+      // this.getParameterFromVox('way', true);
+      // this.getParameterFromVox('par', true);
     }, 30000);
   }
 
@@ -604,21 +610,21 @@ class App extends Component {
   }
 
   setUpToken = (token) => {
-    this.tubObj[token.replace('dai', 'sai')].call((e, r) => {
-      if (!e) {
-        this.setState((prevState, props) => {
-          const system = { ...prevState.system };
-          const tok = { ...system[token] };
-          tok.address = r;
-          system[token] = tok;
-          return { system };
-        }, () => {
-          window[`${token}Obj`] = this[`${token}Obj`] = this.loadObject(token === 'gem' ? dsethtoken.abi : dstoken.abi, r);
-          this.getDataFromToken(token);
-          this.setFilterToken(token);
-        });
-      }
-    })
+    // this.tubObj[token].call((e, r) => {
+    //   if (!e) {
+    //     this.setState((prevState, props) => {
+    //       const system = { ...prevState.system };
+    //       const tok = { ...system[token] };
+    //       tok.address = r;
+    //       system[token] = tok;
+    //       return { system };
+    //     }, () => {
+    //       window[`${token}Obj`] = this[`${token}Obj`] = this.loadObject(token === 'gem' ? dsethtoken.abi : dstoken.abi, r);
+    this.getDataFromToken(token);
+    // this.setFilterToken(token);
+    //     });
+    //   }
+    // })
   }
 
   getDaiTokenBalance = () => {
@@ -647,11 +653,10 @@ class App extends Component {
 
   getBankDaiBalance = () => {
     if (web3.isAddress(this.state.profile.activeProfile)) {
-      this.bankTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
+      this.bankDaiTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
         if (!e) {
-          let system = { ...this.state.system };
-          let bankDaiToken = system.bankDaiToken;
-          bankDaiToken.myBalance = r;
+          let system = this.state.system;
+          system.bankDaiToken.myBalance = r;
           this.setState({system}, function(){
           })
         }
@@ -1058,6 +1063,7 @@ class App extends Component {
   getBalanceOf = (name, address, field) => {
     this[`${name}Obj`].balanceOf.call(address, (e, r) => {
       if (!e) {
+        // alert(name+' balance: ='+r)
         this.setState((prevState, props) => {
           const system = { ...prevState.system };
           const tok = { ...system[name] };
@@ -2094,33 +2100,36 @@ class App extends Component {
   }
 
   wrapUnwrap = (operation, amount) => {
+    // alert('wrapUnwrap called, value: '+web3.toWei(amount))
     const id = Math.random();
-    const title = `WETH: ${operation} ${amount}`;
+    const title = `DAI-B: ${operation} ${amount}`;
     this.logRequestTransaction(id, title);
     const log = (e, tx) => {
       if (!e) {
-        this.logPendingTransaction(id, tx, title, [['setUpToken', 'gem'], ['getAccountBalance']]);
+        alert(tx)
+        this.logPendingTransaction(id, tx, title, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
       } else {
+        alert('ERROR'+e)
         console.log(e);
         this.logTransactionRejected(id, title);
       }
     }
-    if (operation === 'wrap') {
-      if (this.state.profile.mode === 'proxy' && web3.isAddress(this.state.profile.proxy)) {
-        this.proxyObj.execute['address,bytes'](settings.chain[this.state.network.network].proxyContracts.tokenActions,
-          `${this.methodSig(`deposit(address,uint256)`)}${addressToBytes32(this.gemObj.address, false)}${toBytes32(web3.toWei(amount), false)}`,
-          log);
-      } else {
-        this.gemObj.deposit({ value: web3.toWei(amount) }, log);
-      }
-    } else if (operation === 'unwrap') {
-      if (this.state.profile.mode === 'proxy' && web3.isAddress(this.state.profile.proxy)) {
-        this.proxyObj.execute['address,bytes'](settings.chain[this.state.network.network].proxyContracts.tokenActions,
-          `${this.methodSig(`withdraw(address,uint256)`)}${addressToBytes32(this.gemObj.address, false)}${toBytes32(web3.toWei(amount), false)}`,
-          log);
-      } else {
-        this.gemObj.withdraw(web3.toWei(amount), {}, log);
-      }
+    if (operation === 'deposit') {
+      // if (this.state.profile.mode === 'proxy' && web3.isAddress(this.state.profile.proxy)) {
+      //   this.proxyObj.execute['address,bytes'](settings.chain[this.state.network.network].proxyContracts.tokenActions,
+      //     `${this.methodSig(`deposit(address,uint256)`)}${addressToBytes32(this.gemObj.address, false)}${toBytes32(web3.toWei(amount), false)}`,
+      //     log);
+      // } else {
+      this.bankDaiObj.deposit(web3.toWei(amount), log);
+      //}
+    } else if (operation === 'withdraw') {
+      // if (this.state.profile.mode === 'proxy' && web3.isAddress(this.state.profile.proxy)) {
+      //   this.proxyObj.execute['address,bytes'](settings.chain[this.state.network.network].proxyContracts.tokenActions,
+      //     `${this.methodSig(`withdraw(address,uint256)`)}${addressToBytes32(this.gemObj.address, false)}${toBytes32(web3.toWei(amount), false)}`,
+      //     log);
+      // } else {
+      this.bankDaiObj.withdrawal(web3.toWei(amount), log);
+      // }
     }
   }
 
