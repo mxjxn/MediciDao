@@ -75,6 +75,13 @@ class App extends Component {
   getInitialState = () => {
     return {
       system: {
+        bank: {
+          totalLiquidity: -1,
+          availableLiquidity: -1,
+          interestRate: -1,
+          claimPeriod: -1,
+          claimPeriodNumber: -1,
+        },
         tub: {
           address: null,
           authority: null,
@@ -321,6 +328,17 @@ class App extends Component {
 
   validateAddresses = topAddress => {
     return web3.isAddress(topAddress);
+  }
+
+  getBankData = (functionName) => {
+    this.bankDaiObj[`${functionName}`].call((e, r) => {
+      if (!e) {
+        // alert('response:' + r)
+        const system = { ...this.state.system };
+        system.bank[functionName] = r;
+        this.setState({ system });
+      }
+    })
   }
 
   initContracts = (bankDaiAddress, tokenAddress, bankTokenAddress) => {
@@ -1041,6 +1059,11 @@ class App extends Component {
   }
 
   initializeSystemStatus = () => {
+    this.getBankData('totalLiquidity');
+    this.getBankData('availableLiquidity');
+    this.getBankData('interestRate');
+    this.getBankData('claimPeriod');
+    this.getBankData('claimPeriodNumber');
     // this.getParameterFromTub('authority');
     // this.getParameterFromTub('off');
     // this.getParameterFromTub('out');
@@ -2070,7 +2093,7 @@ class App extends Component {
         alert(tx)
         this.logPendingTransaction(id, tx, title, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
       } else {
-        alert('ERROR'+e)
+        alert('ERROR' + e)
         console.log(e);
         this.logTransactionRejected(id, title);
       }
