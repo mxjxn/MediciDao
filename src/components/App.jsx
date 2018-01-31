@@ -665,7 +665,7 @@ class App extends Component {
   }
 
   getBankDaiTotalSupply = () => {
-    this.bankTokenObj.totalSupply.call((e, r) => {
+    this.bankDaiTokenObj.totalSupply.call((e, r) => {
       let system = this.state.system;
       system.bankDaiToken.totalSupply = r;
       this.setState({system}, () => {
