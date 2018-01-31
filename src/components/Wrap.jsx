@@ -48,7 +48,7 @@ class Wrap extends Component {
                     <strong>Dai Balance</strong> <span>{ this.props.accountBalance.gte(0) ? printNumber(this.props.accountBalance) : 'Loading...' }</span>
                   </p>
                   <p>
-                    <strong>Florin Balance</strong> <span>{ this.props.system.gem.myBalance.gte(0) ? printNumber(this.props.system.gem.myBalance) : 'Loading...' }</span>
+                    <strong>Florin Balance</strong> <span>{ this.props.system.bankDai.myBalance.gte(0) ? printNumber(this.props.system.bankDai.myBalance) : 'Loading...' }</span>
                   </p>
                   <label>Operation</label>
                   <select ref={(input) => this.operation = input} >

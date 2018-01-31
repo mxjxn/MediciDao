@@ -109,6 +109,7 @@ class App extends Component {
           address: null,
         },
         bankDai: {
+          myBalance: web3.toBigNumber(-1),
           address: "0xA3A391e69ac6ca112eedFe5bD892133d3eaFec41"
         },
         daiToken: {
@@ -338,6 +339,16 @@ class App extends Component {
       window.daiTokenObj = this.daiTokenObj = this.loadObject(daiToken.abi, tokenAddress);
       window.bankTokenObj = this.bankTokenObj = this.loadObject(bankDaiToken.abi, bankTokenAddress);
 
+      const profile = { ...this.state.profile };
+      profile.mode = 'account';
+      localStorage.setItem('mode', 'account');
+      profile.activeProfile = this.state.network.defaultAccount;
+
+      this.setState({ profile }, () => {
+        this.initializeSystemStatus();
+        this.getBankDaiBalance()
+      })
+
       // const addrs = settings.chain[this.state.network.network];
 
       // const setUpPromises = [this.getTubAddress(), this.getTapAddress()];
@@ -464,10 +475,16 @@ class App extends Component {
   getAccountBalance = () => {
     if (web3.isAddress(this.state.profile.activeProfile)) {
       web3.eth.getBalance(this.state.profile.activeProfile, (e, r) => {
-        const profile = { ...this.state.profile };
-        profile.accountBalance = r;
-        this.setState({ profile });
+        if (!e) {
+          const profile = { ...this.state.profile };
+          profile.accountBalance = r;
+          this.setState({ profile });
+        }
+
       });
+    }
+    else {
+      alert('not active profile:' + this.state.profile.activeProfile)
     }
   }
 
@@ -593,6 +610,23 @@ class App extends Component {
         });
       }
     })
+  }
+
+  getBankDaiBalance = () => {
+    if (web3.isAddress(this.state.profile.activeProfile)) {
+      this.bankTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
+        if (!e) {
+          this.setState((prevState, props) => {
+            const tok = { ...prevState.system.bankDai };
+            alert('system.bankdai:'+tok)
+            tok.myBalance = r;
+            return { tok };
+          }, () => {
+            alert('bankdai balance:' + this.state.system.bankDai.myBalance)
+          })
+        }
+      });
+    }
   }
 
   setFilterToken = (token) => {
@@ -1001,32 +1035,32 @@ class App extends Component {
   }
 
   initializeSystemStatus = () => {
-    this.getParameterFromTub('authority');
-    this.getParameterFromTub('off');
-    this.getParameterFromTub('out');
-    this.getParameterFromTub('axe', true);
-    this.getParameterFromTub('mat', true, this.calculateSafetyAndDeficit);
-    this.getParameterFromTub('cap');
-    this.getParameterFromTub('fit');
-    this.getParameterFromTub('tax', true);
-    this.getParameterFromTub('fee', true);
-    this.getParameterFromTub('chi', true);
-    this.getParameterFromTub('rhi', true);
-    this.getParameterFromTub('per', true);
-    this.getParameterFromTub('gap');
-    this.getParameterFromTub('tag', true, this.calculateSafetyAndDeficit);
-    this.getParameterFromTap('fix', true);
-    this.getParameterFromTap('gap', false, this.getBoomBustValues);
-    this.getParameterFromVox('way', true);
-    this.getParameterFromVox('par', true);
-    this.loadEraRho();
+    // this.getParameterFromTub('authority');
+    // this.getParameterFromTub('off');
+    // this.getParameterFromTub('out');
+    // this.getParameterFromTub('axe', true);
+    // this.getParameterFromTub('mat', true, this.calculateSafetyAndDeficit);
+    // this.getParameterFromTub('cap');
+    // this.getParameterFromTub('fit');
+    // this.getParameterFromTub('tax', true);
+    // this.getParameterFromTub('fee', true);
+    // this.getParameterFromTub('chi', true);
+    // this.getParameterFromTub('rhi', true);
+    // this.getParameterFromTub('per', true);
+    // this.getParameterFromTub('gap');
+    // this.getParameterFromTub('tag', true, this.calculateSafetyAndDeficit);
+    // this.getParameterFromTap('fix', true);
+    // this.getParameterFromTap('gap', false, this.getBoomBustValues);
+    // this.getParameterFromVox('way', true);
+    // this.getParameterFromVox('par', true);
+    // this.loadEraRho();
     this.getAccountBalance();
-    if (settings.chain[this.state.network.network].service) {
-      if (settings.chain[this.state.network.network].chart) {
-        this.getChartData();
-      }
-      this.getStats();
-    }
+    // if (settings.chain[this.state.network.network].service) {
+    //   if (settings.chain[this.state.network.network].chart) {
+    //     this.getChartData();
+    //   }
+    //   this.getStats();
+    // }
   }
 
   calculateSafetyAndDeficit = () => {
