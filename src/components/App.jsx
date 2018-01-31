@@ -5,7 +5,8 @@ import Modal from './modals/Modal';
 import VideoModal from './modals/VideoModal';
 import TerminologyModal from './modals/TerminologyModal';
 import CupHistoryModal from './modals/CupHistoryModal';
-import Token from './Token';
+// import Token from './Token';
+import Token2 from './Token2';
 import GeneralInfo from './GeneralInfo';
 import TokenAllowance from './TokenAllowance';
 import PriceChart from './PriceChart';
@@ -109,13 +110,16 @@ class App extends Component {
           address: null,
         },
         bankDai: {
-          myBalance: web3.toBigNumber(-1),
           address: "0xA3A391e69ac6ca112eedFe5bD892133d3eaFec41"
         },
         daiToken: {
+          myBalance: web3.toBigNumber(-1),
+          totalSupply: web3.toBigNumber(-1),
           address: "0xf14adA897252D9B3F89c10910f885dFec4bFEba9"
         },
         bankDaiToken: {
+          myBalance: web3.toBigNumber(-1),
+          totalSupply: web3.toBigNumber(-1),
           address: "0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D"
         },
         tap: {
@@ -347,6 +351,9 @@ class App extends Component {
       this.setState({ profile }, () => {
         this.initializeSystemStatus();
         this.getBankDaiBalance()
+        this.getBankDaiTotalSupply();
+        this.getDaiTokenBalance();
+        this.getDaiTokenTotalSupply();
       })
 
       // const addrs = settings.chain[this.state.network.network];
@@ -629,18 +636,36 @@ class App extends Component {
     }
   }
 
+  getDaiTokenTotalSupply = () => {
+    this.daiTokenObj.totalSupply.call((e, r) => {
+      let system = this.state.system;
+      system.daiToken.totalSupply = r;
+      this.setState({system}, () => {
+      })
+    })
+  }
+
   getBankDaiBalance = () => {
     if (web3.isAddress(this.state.profile.activeProfile)) {
       this.bankTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
         if (!e) {
           let system = { ...this.state.system };
-          let bankDai = system.bankDai;
-          bankDai.myBalance = r;
+          let bankDaiToken = system.bankDaiToken;
+          bankDaiToken.myBalance = r;
           this.setState({system}, function(){
           })
         }
       });
     }
+  }
+
+  getBankDaiTotalSupply = () => {
+    this.bankTokenObj.totalSupply.call((e, r) => {
+      let system = this.state.system;
+      system.bankDaiToken.totalSupply = r;
+      this.setState({system}, () => {
+      })
+    })
   }
 
   setFilterToken = (token) => {
@@ -2297,11 +2322,15 @@ class App extends Component {
               </div>
             </div>
             <div className="row">
-              {/* <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='gem' color='' off={this.state.system.tub.off} />
-                  <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='gov' color='' off={this.state.system.tub.off} /> */}
+              {/*
+              <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='gem' color='' off={this.state.system.tub.off} />
+              <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='gov' color='' off={this.state.system.tub.off} /> 
               <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='skr' color='bg-aqua' actions={skrActions} handleOpenModal={this.handleOpenModal} />
               <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='dai' color='bg-green' actions={daiActions} handleOpenModal={this.handleOpenModal} />
-              {/* <Token system={ this.state.system } network={ this.state.network.network } account={ this.state.network.defaultAccount } token='sin' color='bg-red' /> */}
+              <Token system={ this.state.system } network={ this.state.network.network } account={ this.state.network.defaultAccount } token='sin' color='bg-red' />
+              */}
+              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiToken' color='bg-aqua' />
+              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='bankDaiToken' color='bg-green' />
             </div>
             <div className="row">
               <div className="col-md-9">

@@ -31,7 +31,8 @@ const Token = (props) => {
           {
             token.myBalance &&
             <span className="info-box-number">
-              <span style={ { textDecoration: 'underline' } }>{ etherscanToken(props.network, 'Your Balance', token.address, props.account) }</span>
+              <span style={ { textDecoration: 'underline' } }>
+                { etherscanToken(props.network, 'Your Balance', token.address, props.account) }</span>
               {
                 props.account
                 ?
