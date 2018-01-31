@@ -612,6 +612,21 @@ class App extends Component {
     })
   }
 
+  getDaiTokenBalance = () => {
+    if (web3.isAddress(this.state.profile.activeProfile)) {
+      this.daiTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
+        if (!e) {
+          let system = { ...this.state.system };
+          let daiToken = system.daiToken;
+          daiToken.myBalance = r;
+          this.setState({system},() => {
+            //alert( 'dai balance: ' + this.state.system.daiToken.myBalance);
+          })
+        }
+      })
+    }
+  }
+
   getBankDaiBalance = () => {
     if (web3.isAddress(this.state.profile.activeProfile)) {
       this.bankTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
@@ -620,8 +635,7 @@ class App extends Component {
           let bankDai = system.bankDai;
           bankDai.myBalance = r;
           this.setState({system}, function(){
-            alert('balance: '+this.state.system.bankDai.myBalance);
-            // alert('balance: '+r);
+            // alert('balance: '+this.state.system.bankDai.myBalance);
           })
         }
       });
