@@ -17,7 +17,7 @@ class Wrap extends Component {
       this.setState({ error: 'Invalid Amount' });
     } else if (operation === 'deposit' && this.props.accountBalance.lt(web3.toWei(amount))) {
       this.setState({ error: `Not enough balance to deposit ${amount} DAI` });
-    } else if (operation === 'withdraw' && this.props.system.bankDai.myBalance.lt(web3.toWei(amount))) {
+    } else if (operation === 'withdraw' && this.props.system.bankDaiToken.myBalance.lt(web3.toWei(amount))) {
       this.setState({ error: `Not enough balance to withdraw ${amount} DAI-B` });
     } else {
       this.props.wrapUnwrap(operation, amount);
