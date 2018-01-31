@@ -81,7 +81,9 @@ export function copyToClipboard(e) {
   const parent = e.target;
   setTimeout(() => parent.removeChild(div), 1000);
 }
-
+export function print(value){
+  return <span onClick={ copyToClipboard }>{ formatNumber(value,1) }</span>
+}
 export function printNumber(number) {
   return <span className="printedNumber" onClick={ copyToClipboard } title={ formatNumber(number, 18) }>{ formatNumber(number, 3) }</span>
 }
