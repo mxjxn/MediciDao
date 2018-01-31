@@ -616,13 +616,12 @@ class App extends Component {
     if (web3.isAddress(this.state.profile.activeProfile)) {
       this.bankTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
         if (!e) {
-          this.setState((prevState, props) => {
-            const tok = { ...prevState.system.bankDai };
-            alert('system.bankdai:'+tok)
-            tok.myBalance = r;
-            return { tok };
-          }, () => {
-            alert('bankdai balance:' + this.state.system.bankDai.myBalance)
+          let system = { ...this.state.system };
+          let bankDai = system.bankDai;
+          bankDai.myBalance = r;
+          this.setState({system}, function(){
+            alert('balance: '+this.state.system.bankDai.myBalance);
+            // alert('balance: '+r);
           })
         }
       });
