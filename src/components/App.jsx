@@ -2111,7 +2111,7 @@ class App extends Component {
   }
 
   transferToken = (token, to, amount) => {
-    const tokenName = token.replace('gem', 'weth').replace('gov', 'mkr').replace('skr', 'peth').toUpperCase();
+    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI');
     const id = Math.random();
     const title = `${tokenName}: transfer ${to} ${amount}`;
     this.logRequestTransaction(id, title);
@@ -2123,13 +2123,7 @@ class App extends Component {
         this.logTransactionRejected(id, title);
       }
     }
-    if (this.state.profile.mode === 'proxy' && web3.isAddress(this.state.profile.proxy)) {
-      this.proxyObj.execute['address,bytes'](settings.chain[this.state.network.network].proxyContracts.tokenActions,
-        `${this.methodSig(`transfer(address,address,uint256)`)}${addressToBytes32(this[`${token}Obj`].address, false)}${addressToBytes32(to, false)}${toBytes32(web3.toWei(amount), false)}`,
-        log);
-    } else {
-      this[`${token}Obj`].transfer(to, web3.toWei(amount), {}, log);
-    }
+    this[`${token}Obj`].transfer(to, web3.toWei(amount), log);
   }
 
   wrapUnwrap = (operation, amount) => {
@@ -2139,10 +2133,10 @@ class App extends Component {
     const title = `DAI-B: ${operation} ${amount}`;
     const approveTitle = `Approving DAI-B: ${operation} ${amount}`;
     this.logRequestTransaction(approveId, approveTitle);
-    
+
     const log = (e, tx) => {
       if (!e) {
-        alert(tx)
+        // alert(tx)
         this.logPendingTransaction(id, tx, title, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
       } else {
         alert('ERROR' + e)
