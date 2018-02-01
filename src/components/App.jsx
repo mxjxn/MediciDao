@@ -117,17 +117,21 @@ class App extends Component {
           address: null,
         },
         bankDai: {
-          address: "0xA3A391e69ac6ca112eedFe5bD892133d3eaFec41"
+          address: "0xA3A391e69ac6ca112eedFe5bD892133d3eaFec41",
+          daiTokenApproved: -1,
+          bankDaiTokenApproved: -1
         },
         daiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0xf14adA897252D9B3F89c10910f885dFec4bFEba9"
+          address: "0xf14adA897252D9B3F89c10910f885dFec4bFEba9",
+          approvedAmount: -1
         },
         bankDaiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D"
+          address: "0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D",
+          approvedAmount: -1
         },
         tap: {
           address: null,
@@ -652,7 +656,7 @@ class App extends Component {
           let system = { ...this.state.system };
           let daiToken = system.daiToken;
           daiToken.myBalance = r;
-          this.setState({system},() => {
+          this.setState({ system }, () => {
             //alert( 'dai balance: ' + this.state.system.daiToken.myBalance);
           })
         }
@@ -664,7 +668,7 @@ class App extends Component {
     this.daiTokenObj.totalSupply.call((e, r) => {
       let system = this.state.system;
       system.daiToken.totalSupply = r;
-      this.setState({system}, () => {
+      this.setState({ system }, () => {
       })
     })
   }
@@ -675,7 +679,7 @@ class App extends Component {
         if (!e) {
           let system = this.state.system;
           system.bankDaiToken.myBalance = r;
-          this.setState({system}, function(){
+          this.setState({ system }, function () {
           })
         }
       });
@@ -686,7 +690,7 @@ class App extends Component {
     this.bankDaiTokenObj.totalSupply.call((e, r) => {
       let system = this.state.system;
       system.bankDaiToken.totalSupply = r;
-      this.setState({system}, () => {
+      this.setState({ system }, () => {
       })
     })
   }
@@ -1023,38 +1027,44 @@ class App extends Component {
 
   getDataFromToken = token => {
     this.getTotalSupply(token);
-
-    if (token !== 'sin' && web3.isAddress(this.state.profile.activeProfile)) {
-      this.getBalanceOf(token, this.state.profile.activeProfile, 'myBalance');
-    }
-    if (token === 'gem' || token === 'skr' || token === 'sin') {
-      this.getBalanceOf(token, this.state.system.tub.address, 'tubBalance');
-    }
-    if (token === 'gem' || token === 'skr' || token === 'dai' || token === 'sin') {
-      this.getBalanceOf(token, this.state.system.tap.address, 'tapBalance');
-      this.getBoomBustValues();
-    }
-    if (token === 'gem' || token === 'skr') {
-      this.getParameterFromTub('per', true);
-    }
-    if (token === 'gem' || token === 'skr' || token === 'dai' || token === 'gov') {
-      this.getApproval(token, 'tub');
-      if (token !== 'gov') {
-        this.getApproval(token, 'tap');
-      }
-    }
-    if (token === 'gov') {
-      this.getBalanceOf(token, this.state.system.pit.address, 'pitBalance');
-    }
+    this.getApproval('bankDaiToken', 'bankDai');
+    this.getApproval('daiToken', 'bankDai')
+    // if (token !== 'sin' && web3.isAddress(this.state.profile.activeProfile)) {
+    //   this.getBalanceOf(token, this.state.profile.activeProfile, 'myBalance');
+    // }
+    // if (token === 'gem' || token === 'skr' || token === 'sin') {
+    //   this.getBalanceOf(token, this.state.system.tub.address, 'tubBalance');
+    // }
+    // if (token === 'gem' || token === 'skr' || token === 'dai' || token === 'sin') {
+    //   this.getBalanceOf(token, this.state.system.tap.address, 'tapBalance');
+    //   this.getBoomBustValues();
+    // }
+    // if (token === 'gem' || token === 'skr') {
+    //   this.getParameterFromTub('per', true);
+    // }
+    // if (token === 'gem' || token === 'skr' || token === 'dai' || token === 'gov') {
+    //   this.getApproval(token, 'tub');
+    //   if (token !== 'gov') {
+    //     this.getApproval(token, 'tap');
+    //   }
+    // }
+    // if (token === 'gov') {
+    //   this.getBalanceOf(token, this.state.system.pit.address, 'pitBalance');
+    // }
   }
 
-  getApproval = (token, dst) => {
-    Promise.resolve(this.allowance(token, dst)).then(r => {
+  getApproval = (token, spender) => {
+    Promise.resolve(this.allowance(token, spender)).then(r => {
       this.setState((prevState, props) => {
         const system = { ...prevState.system };
-        const tok = { ...system[token] };
-        tok[`${dst}Approved`] = r.eq(web3.toBigNumber(2).pow(256).minus(1));
-        system[token] = tok;
+        const tok = { ...system[spender] };
+        if (spender === 'bankDai') {
+          system[spender][`${token}Approved`] = r;
+        }
+        else {
+          system[spender].approvedAmount = r;
+        }
+        // alert(spender+': approved to spend '+JSON.stringify(system[spender])+' of '+token)
         return { system };
       });
     }, () => { });
@@ -1759,10 +1769,10 @@ class App extends Component {
     }
   }
 
-  allowance = (token, dst) => {
+  allowance = (token, spender) => {
     return new Promise((resolve, reject) => {
       if (this.state.profile.activeProfile) {
-        this[`${token}Obj`].allowance.call(this.state.profile.activeProfile, this[`${dst}Obj`].address, (e, r) => {
+        this[`${token}Obj`].allowance.call(this.state.profile.activeProfile, this.state.system[`${spender}`].address, (e, r) => {
           if (!e) {
             resolve(r);
           } else {
@@ -2125,8 +2135,11 @@ class App extends Component {
   wrapUnwrap = (operation, amount) => {
     // alert('wrapUnwrap called, value: '+web3.toWei(amount))
     const id = Math.random();
+    const approveId = Math.random();
     const title = `DAI-B: ${operation} ${amount}`;
-    this.logRequestTransaction(id, title);
+    const approveTitle = `Approving DAI-B: ${operation} ${amount}`;
+    this.logRequestTransaction(approveId, approveTitle);
+    
     const log = (e, tx) => {
       if (!e) {
         alert(tx)
@@ -2137,13 +2150,25 @@ class App extends Component {
         this.logTransactionRejected(id, title);
       }
     }
+
     if (operation === 'deposit') {
       // if (this.state.profile.mode === 'proxy' && web3.isAddress(this.state.profile.proxy)) {
       //   this.proxyObj.execute['address,bytes'](settings.chain[this.state.network.network].proxyContracts.tokenActions,
       //     `${this.methodSig(`deposit(address,uint256)`)}${addressToBytes32(this.gemObj.address, false)}${toBytes32(web3.toWei(amount), false)}`,
       //     log);
       // } else {
-      this.bankDaiObj.deposit(web3.toWei(amount), log);
+      this.daiTokenObj.approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+        if (!e) {
+          alert(tx)
+          this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
+          this.logRequestTransaction(id, title);
+          this.bankDaiObj.deposit(web3.toWei(amount), log);
+        } else {
+          alert('ERROR' + e)
+          console.log(e);
+          this.logTransactionRejected(approveId, approveTitle);
+        }
+      })
       //}
     } else if (operation === 'withdraw') {
       // if (this.state.profile.mode === 'proxy' && web3.isAddress(this.state.profile.proxy)) {
@@ -2151,8 +2176,35 @@ class App extends Component {
       //     `${this.methodSig(`withdraw(address,uint256)`)}${addressToBytes32(this.gemObj.address, false)}${toBytes32(web3.toWei(amount), false)}`,
       //     log);
       // } else {
-      this.bankDaiObj.withdrawal(web3.toWei(amount), log);
+      this.bankDaiTokenObj.approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+        if (!e) {
+          alert(tx)
+          this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
+          this.logRequestTransaction(id, title);
+          this.bankDaiObj.withdrawal(web3.toWei(amount), log);
+        } else {
+          alert('ERROR' + e)
+          console.log(e);
+          this.logTransactionRejected(approveId, approveTitle);
+        }
+      })
+
       // }
+    }
+  }
+
+  approveDepositWithdraw(token, amount) {
+    const id = Math.random();
+    const title = `${token}: approving ${amount}`;
+    this.logRequestTransaction(id, title);
+
+    const log = (e, tx) => {
+      if (!e) {
+        this.logPendingTransaction(id, tx, title, [['getApproval', token]]);
+      } else {
+        console.log(e);
+        this.logTransactionRejected(id, title);
+      }
     }
   }
 
