@@ -4,20 +4,21 @@ import { formatNumber, copyToClipboard, etherscanToken } from '../helpers';
 
 const Token2 = (props) => {
   const token = props.system[props.token];
-  const tokenName = props.token.replace('bankDaiToken', 'dai-b').replace('daiToken', 'dai');
+  const tokenName = props.token.replace('bankDaiToken', 'dai-b').replace('daiToken', 'dai').replace('cdoToken', 'cdo');
+  const address = token.address || '';
 
   return (
     <div className="col-md-6 col-sm-6 col-xs-12">
       <div className="info-box big">
         <span className={`info-box-icon ${props.color}`}>
-          { etherscanToken(props.network, tokenName, token.address) }
+          { etherscanToken(props.network, tokenName, address) }
         </span>
         <div className="info-box-content">
           {
             token.myBalance &&
             <span className="info-box-number">
               <span style={ { textDecoration: 'underline' } }>
-                { etherscanToken(props.network, 'Your Balance', token.address, props.account) }
+                { etherscanToken(props.network, 'Your Balance', address, props.account) }
               </span>
               {
                 props.account
@@ -35,7 +36,7 @@ const Token2 = (props) => {
           }
           <span className="info-box-number">
             <span>
-              { etherscanToken(props.network, 'Total Supply', token.address) }
+              { etherscanToken(props.network, 'Total Supply', address) }
             </span>
             <AnimatedNumber
               value={ token.totalSupply }

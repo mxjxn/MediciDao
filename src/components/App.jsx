@@ -133,6 +133,10 @@ class App extends Component {
           address: "0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D",
           approvedAmount: -1
         },
+        cdoToken: {
+          myBalance: web3.toBigNumber(0),
+          totalSupply: web3.toBigNumber(0)
+        },
         tap: {
           address: null,
           fix: web3.toBigNumber(-1),
@@ -2407,6 +2411,7 @@ class App extends Component {
               <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='dai' color='bg-green' actions={daiActions} handleOpenModal={this.handleOpenModal} />
               <Token system={ this.state.system } network={ this.state.network.network } account={ this.state.network.defaultAccount } token='sin' color='bg-red' />
               */}
+              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='cdoToken' color='bg-aqua' />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiToken' color='bg-aqua' />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='bankDaiToken' color='bg-green' />
             </div>
