@@ -14,6 +14,8 @@ import SystemStatus from './SystemStatus';
 import BankStatus from './BankStatus';
 import Cups from './Cups';
 import Wrap from './Wrap';
+import BorrowRepay from './BorrowRepay';
+import BuyDebt from './BuyDebt';
 import Transfer from './Transfer';
 import FeedValue from './FeedValue';
 import ResourceButtons from './ResourceButtons';
@@ -534,9 +536,6 @@ class App extends Component {
         }
 
       });
-    }
-    else {
-      alert('not active profile:' + this.state.profile.activeProfile)
     }
   }
 
@@ -2226,6 +2225,51 @@ class App extends Component {
     }
   }
 
+  borrowRepay = (operation, amount) => {
+    const id = Math.random();
+    const title = `DAI: ${operation} ${amount}`;
+
+    const approveId = Math.random();
+    const approveTitle = `Approving DAI: ${operation} ${amount}`;
+
+    const log = (e, tx) => {
+      if (!e) {
+        // alert(tx)
+        this.logPendingTransaction(id, tx, title, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
+      } else {
+        alert('ERROR' + e)
+        console.log(e);
+        this.logTransactionRejected(id, title);
+      }
+    }
+
+    if (operation === 'repay') {
+      this.logRequestTransaction(approveId, approveTitle);
+      this.daiTokenObj.approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+        if (!e) {
+          alert(tx)
+          this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
+          this.logRequestTransaction(id, title);
+          this.bankDaiObj.repayment(web3.toWei(amount), log);
+        } else {
+          alert('ERROR' + e)
+          console.log(e);
+          this.logTransactionRejected(approveId, approveTitle);
+        }
+      })
+    } else if (operation === 'borrow') {
+      alert('borrowing')
+      this.logRequestTransaction(id, title);
+      this.bankDaiObj.credit(web3.toWei(amount), log);
+      // this.bankDaiObj.setApprovedBorrowerAmount(this.state.profile.activeProfile,web3.toWei(amount), 'test', 'DAI', 0, 0, log);
+
+    }
+  }
+
+  buyDebt(amount) {
+    alert('you\'re buying ' + amount + ' debt');
+  }
+
   approveDepositWithdraw(token, amount) {
     const id = Math.random();
     const title = `${token}: approving ${amount}`;
@@ -2459,22 +2503,30 @@ class App extends Component {
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='cdoToken' color='bg-aqua' />
             </div>
             <div className="row">
-              <div className="col-md-9">
+              <div className="col-md-12">
                 {
                   settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
                     ? <PriceChart chartData={this.state.system.chartData} />
                     : ''
                 }
                 <BankStatus system={this.state.system} actions={bustBoomActions} handleOpenModal={this.handleOpenModal} service={settings.chain[this.state.network.network].service} stats={this.state.system.stats} />
+              </div>
+              <div className="col-md-12">
                 {
                   web3.isAddress(this.state.network.defaultAccount)
                     ?
                     <div className="row">
-                      <div className="col-md-6">
+                      <div className="col-md-6 col-sm-6">
                         <Wrap wrapUnwrap={this.wrapUnwrap} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
                       </div>
-                      <div className="col-md-6">
+                      <div className="col-md-6 col-sm-6">
                         <Transfer transferToken={this.transferToken} system={this.state.system} profile={this.state.profile} network={this.state.network.network} account={this.state.network.defaultAccount} />
+                      </div>
+                      <div className="col-md-6 col-sm-6">
+                        <BorrowRepay borrowRepay={this.borrowRepay} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
+                      </div>
+                      <div className="col-md-6 col-sm-6">
+                        <BuyDebt buyDebt={this.buyDebt} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
                       </div>
                     </div>
                     :

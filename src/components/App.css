@@ -51,7 +51,7 @@ div#cups > .row > .col-md-12 > div {
 }
 
 .info-box.big {
-  min-height: 130px;
+  min-height: 80px;
 }
 
 .info-box-icon {
@@ -63,7 +63,7 @@ div#cups > .row > .col-md-12 > div {
 }
 
 .info-box.big .info-box-icon {
-  line-height: 130px;
+  line-height: 80px;
 }
 
 .info-box-number {
