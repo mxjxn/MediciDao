@@ -15,6 +15,7 @@ import BankStatus from './BankStatus';
 import Cups from './Cups';
 import Wrap from './Wrap';
 import BorrowRepay from './BorrowRepay';
+import BuyDebt from './BuyDebt';
 import Transfer from './Transfer';
 import FeedValue from './FeedValue';
 import ResourceButtons from './ResourceButtons';
@@ -2226,6 +2227,10 @@ class App extends Component {
     }
   }
 
+  buyDebt(amount) {
+    alert('you\'re buying ' + amount + ' debt');
+  }
+
   approveDepositWithdraw(token, amount) {
     const id = Math.random();
     const title = `${token}: approving ${amount}`;
@@ -2450,25 +2455,30 @@ class App extends Component {
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='bankDaiToken' color='bg-green' />
             </div>
             <div className="row">
-              <div className="col-md-9">
+              <div className="col-md-12">
                 {
                   settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
                     ? <PriceChart chartData={this.state.system.chartData} />
                     : ''
                 }
                 <BankStatus system={this.state.system} actions={bustBoomActions} handleOpenModal={this.handleOpenModal} service={settings.chain[this.state.network.network].service} stats={this.state.system.stats} />
+              </div>
+              <div className="col-md-12">
                 {
                   web3.isAddress(this.state.network.defaultAccount)
                     ?
                     <div className="row">
-                      <div className="col-md-6">
+                      <div className="col-md-6 col-sm-6">
                         <Wrap wrapUnwrap={this.wrapUnwrap} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
                       </div>
-                      <div className="col-md-6">
+                      <div className="col-md-6 col-sm-6">
                         <Transfer transferToken={this.transferToken} system={this.state.system} profile={this.state.profile} network={this.state.network.network} account={this.state.network.defaultAccount} />
                       </div>
-                      <div className="col-md-6">
+                      <div className="col-md-6 col-sm-6">
                         <BorrowRepay borrowRepay={this.borrowRepay} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
+                      </div>
+                      <div className="col-md-6 col-sm-6">
+                        <BuyDebt buyDebt={this.buyDebt} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
                       </div>
                     </div>
                     :
