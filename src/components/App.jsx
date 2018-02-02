@@ -120,7 +120,7 @@ class App extends Component {
           address: null,
         },
         bankDai: {
-          address: "0x3236b3d5acc26f5612f6780473b14013dd290f13",
+          address: "0xAed5F5D8Acf0078efA38CA68BF66234509eBD83a",
           daiTokenApproved: -1,
           bankDaiTokenApproved: -1
         },
