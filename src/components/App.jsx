@@ -14,6 +14,7 @@ import SystemStatus from './SystemStatus';
 import BankStatus from './BankStatus';
 import Cups from './Cups';
 import Wrap from './Wrap';
+import BorrowRepay from './BorrowRepay';
 import Transfer from './Transfer';
 import FeedValue from './FeedValue';
 import ResourceButtons from './ResourceButtons';
@@ -519,9 +520,6 @@ class App extends Component {
         }
 
       });
-    }
-    else {
-      alert('not active profile:' + this.state.profile.activeProfile)
     }
   }
 
@@ -2187,6 +2185,47 @@ class App extends Component {
     }
   }
 
+  borrowRepay = (operation, amount) => {
+    const id = Math.random();
+    const title = `DAI: ${operation} ${amount}`;
+
+    const approveId = Math.random();
+    const approveTitle = `Approving DAI: ${operation} ${amount}`;
+
+    const log = (e, tx) => {
+      if (!e) {
+        // alert(tx)
+        this.logPendingTransaction(id, tx, title, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
+      } else {
+        alert('ERROR' + e)
+        console.log(e);
+        this.logTransactionRejected(id, title);
+      }
+    }
+
+    if (operation === 'repay') {
+      this.logRequestTransaction(approveId, approveTitle);
+      this.daiTokenObj.approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+        if (!e) {
+          alert(tx)
+          this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
+          this.logRequestTransaction(id, title);
+          this.bankDaiObj.repayment(web3.toWei(amount), log);
+        } else {
+          alert('ERROR' + e)
+          console.log(e);
+          this.logTransactionRejected(approveId, approveTitle);
+        }
+      })
+    } else if (operation === 'borrow') {
+      alert('borrowing')
+      this.logRequestTransaction(id, title);
+      this.bankDaiObj.credit(web3.toWei(amount), log);
+      // this.bankDaiObj.setApprovedBorrowerAmount(this.state.profile.activeProfile,web3.toWei(amount), 'test', 'DAI', 0, 0, log);
+
+    }
+  }
+
   approveDepositWithdraw(token, amount) {
     const id = Math.random();
     const title = `${token}: approving ${amount}`;
@@ -2427,6 +2466,9 @@ class App extends Component {
                       </div>
                       <div className="col-md-6">
                         <Transfer transferToken={this.transferToken} system={this.state.system} profile={this.state.profile} network={this.state.network.network} account={this.state.network.defaultAccount} />
+                      </div>
+                      <div className="col-md-6">
+                        <BorrowRepay borrowRepay={this.borrowRepay} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
                       </div>
                     </div>
                     :
