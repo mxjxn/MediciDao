@@ -46,7 +46,7 @@
       "fromBlock":  2547103,
       "BankDai": {
         "address":"0xAed5F5D8Acf0078efA38CA68BF66234509eBD83a",
-        "fromBlock":2572204
+        "fromBlock":2574804
       },
       "DSTokenBase":{
         "address":"0x205fe746380d20ef3621b2b47edbfb09d2e16cce",
