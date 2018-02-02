@@ -54,6 +54,7 @@ class GeneralInfo extends Component {
                 <div><strong>Dai:</strong> { etherscanAddress(this.props.network, this.props.dai, this.props.dai) }</div>
                 <div><strong>BankDai:</strong> { etherscanAddress(this.props.network, this.props.bankDai, this.props.bankDai) }</div>
                 <div><strong>BankDaiToken:</strong> { etherscanAddress(this.props.network, this.props.bankDaiToken, this.props.bankDaiToken) }</div>
+                <div><strong>DaiCToken:</strong> { etherscanAddress(this.props.network, this.props.daiCToken, this.props.daiCToken) }</div>
               </div>
             </div>
             {/* <div className="col-md-6">

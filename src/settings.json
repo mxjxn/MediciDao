@@ -45,16 +45,20 @@
       "top": "0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D",
       "fromBlock":  2547103,
       "BankDai": {
-        "address":"0xA3A391e69ac6ca112eedFe5bD892133d3eaFec41",
-        "fromBlock":2547068
+        "address":"0x3236b3d5acc26f5612f6780473b14013dd290f13",
+        "fromBlock":2572204
       },
       "DSTokenBase":{
-        "address":"0xf14adA897252D9B3F89c10910f885dFec4bFEba9",
-        "fromBlock":2547092
+        "address":"0x205fe746380d20ef3621b2b47edbfb09d2e16cce",
+        "fromBlock":2572285
       },
       "BankDaiToken":{
-        "address":"0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D",
-        "fromBlock":2547103
+        "address":"0x66D875CB74Dd2C0F134B9EecB7a6Fb9783E52F30",
+        "fromBlock":2572270
+      },
+      "DaiCToken": {
+        "address": "0x4cF50A690b9b0Aa395fdbebb298ca5498577d516",
+        "fromBlock": 2572324
       },
       "service": "",
       "chart": false,

@@ -4,8 +4,12 @@ import { formatNumber, copyToClipboard, etherscanToken } from '../helpers';
 
 const Token2 = (props) => {
   const token = props.system[props.token];
-  const tokenName = props.token.replace('bankDaiToken', 'dai-b').replace('daiToken', 'dai').replace('cdoToken', 'cdo');
-  const address = token.address || '';
+  const tokenName = props.token
+                         .replace('bankDaiToken', 'dai-b')
+                         .replace('daiToken', 'dai')
+                         .replace('cdoToken', 'cdo')
+                         .replace('daiCToken', 'dai-c');
+  const address = token.address;
 
   return (
     <div className="col-md-6 col-sm-6 col-xs-12">

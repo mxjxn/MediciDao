@@ -28,6 +28,7 @@ const settings = require('../settings');
 const bankDai = require('../abi/bankdai.json');
 const daiToken = require('../abi/daitoken.json');
 const bankDaiToken = require('../abi/bankDaiToken.json');
+const daiCToken = require('../abi/daiCToken.json');
 const tub = require('../abi/saitub');
 const top = require('../abi/saitop');
 const tap = require('../abi/saitap');
@@ -117,25 +118,32 @@ class App extends Component {
           address: null,
         },
         bankDai: {
-          address: "0xA3A391e69ac6ca112eedFe5bD892133d3eaFec41",
+          address: "0x3236b3d5acc26f5612f6780473b14013dd290f13",
           daiTokenApproved: -1,
           bankDaiTokenApproved: -1
         },
         daiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0xf14adA897252D9B3F89c10910f885dFec4bFEba9",
+          address: "0x205fe746380d20ef3621b2b47edbfb09d2e16cce",
+          approvedAmount: -1
+        },
+        daiCToken: {
+          myBalance: web3.toBigNumber(-1),
+          totalSupply: web3.toBigNumber(-1),
+          address:"0x4cf50a690b9b0aa395fdbebb298ca5498577d516",
           approvedAmount: -1
         },
         bankDaiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D",
+          address: "0x66d875cb74dd2c0f134b9eecb7a6fb9783e52f30",
           approvedAmount: -1
         },
         cdoToken: {
           myBalance: web3.toBigNumber(0),
-          totalSupply: web3.toBigNumber(0)
+          totalSupply: web3.toBigNumber(0),
+          address: "",
         },
         tap: {
           address: null,
@@ -283,7 +291,7 @@ class App extends Component {
     networkState.latestBlock = 0;
     this.setState({ network: networkState }, () => {
       const addrs = settings.chain[this.state.network.network];
-      this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address);
+      this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address);
     });
   }
 
@@ -317,7 +325,7 @@ class App extends Component {
     this.setHashParams();
     window.onhashchange = () => {
       this.setHashParams();
-      this.initContracts(this.state.system.bankDai.address, this.state.system.daiToken.address, this.state.system.bankDaiToken.address);
+      this.initContracts(this.state.system.bankDai.address, this.state.system.daiToken.address, this.state.system.bankDaiToken.address, this.state.system.daiCToken.address);
     }
 
     if (localStorage.getItem('termsModal')) {
@@ -353,8 +361,8 @@ class App extends Component {
     })
   }
 
-  initContracts = (bankDaiAddress, tokenAddress, bankTokenAddress) => {
-    if (!this.validateAddresses(bankDaiAddress) || !this.validateAddresses(tokenAddress) || !this.validateAddresses(bankTokenAddress)) {
+  initContracts = (bankDaiAddress, tokenAddress, bankTokenAddress, daiCTokenAddress) => {
+    if (!this.validateAddresses(bankDaiAddress) || !this.validateAddresses(tokenAddress) || !this.validateAddresses(bankTokenAddress) || !this.validateAddresses(daiCTokenAddress)) {
       return;
     }
     web3.reset(true);
@@ -368,6 +376,7 @@ class App extends Component {
       window.bankDaiObj = this.bankDaiObj = this.loadObject(bankDai.abi, bankDaiAddress);
       window.daiTokenObj = this.daiTokenObj = this.loadObject(daiToken.abi, tokenAddress);
       window.bankDaiTokenObj = this.bankDaiTokenObj = this.loadObject(bankDaiToken.abi, bankTokenAddress);
+      window.daiCTokenObj = this.daiCTokenObj = this.loadObject(daiCToken.abi, daiCTokenAddress);
 
       const profile = { ...this.state.profile };
       profile.mode = 'account';
@@ -380,6 +389,8 @@ class App extends Component {
         this.getBankDaiTotalSupply();
         this.getDaiTokenBalance();
         this.getDaiTokenTotalSupply();
+        this.getDaiCTokenBalance();
+        this.getDaiCTokenTotalSupply();
         this.setTimeVariablesInterval();
         this.setNonTimeVariablesInterval();
 
@@ -653,6 +664,30 @@ class App extends Component {
     // })
   }
 
+  getDaiCTokenBalance = () => {
+    if (web3.isAddress(this.state.profile.activeProfile)) {
+      this.daiCTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
+        if (!e) {
+          let system = { ...this.state.system };
+          let daiCToken = system.daiCToken;
+          daiCToken.myBalance = r;
+          this.setState({ system }, () => {
+            //alert( 'dai balance: ' + this.state.system.daiToken.myBalance);
+          })
+        }
+      })
+    }
+  }
+
+  getDaiCTokenTotalSupply = () => {
+    this.daiCTokenObj.totalSupply.call((e, r) => {
+      let system = this.state.system;
+      system.daiCToken.totalSupply = r;
+      this.setState({ system }, () => {
+      })
+    })
+  }
+  
   getDaiTokenBalance = () => {
     if (web3.isAddress(this.state.profile.activeProfile)) {
       this.daiTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
@@ -2399,7 +2434,14 @@ class App extends Component {
           <div>
             <div className="row">
               <div className="col-md-12">
-                <GeneralInfo dai={this.state.system.daiToken.address} bankDai={this.state.system.bankDai.address} bankDaiToken={this.state.system.bankDaiToken.address} network={this.state.network.network} account={this.state.network.defaultAccount} proxy={this.state.profile.proxy}
+                <GeneralInfo
+                  dai={this.state.system.daiToken.address}
+                  bankDai={this.state.system.bankDai.address}
+                  bankDaiToken={this.state.system.bankDaiToken.address}
+                  daiCToken={this.state.system.daiCToken.address}
+                  network={this.state.network.network}
+                  account={this.state.network.defaultAccount}
+                  proxy={this.state.profile.proxy}
                   initContracts={this.initContracts} />
               </div>
             </div>
@@ -2411,9 +2453,10 @@ class App extends Component {
               <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='dai' color='bg-green' actions={daiActions} handleOpenModal={this.handleOpenModal} />
               <Token system={ this.state.system } network={ this.state.network.network } account={ this.state.network.defaultAccount } token='sin' color='bg-red' />
               */}
-              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='cdoToken' color='bg-aqua' />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiToken' color='bg-aqua' />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='bankDaiToken' color='bg-green' />
+              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiCToken' color='bg-green' />
+              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='cdoToken' color='bg-aqua' />
             </div>
             <div className="row">
               <div className="col-md-9">
