@@ -31,6 +31,7 @@ const bankDai = require('../abi/bankdai.json');
 const daiToken = require('../abi/daitoken.json');
 const bankDaiToken = require('../abi/bankDaiToken.json');
 const daiCToken = require('../abi/daiCToken.json');
+const cdoToken = require('../abi/cdoToken.json');
 const tub = require('../abi/saitub');
 const top = require('../abi/saitop');
 const tap = require('../abi/saitap');
@@ -127,19 +128,19 @@ class App extends Component {
         daiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0x205fe746380d20ef3621b2b47edbfb09d2e16cce",
+          address: "0x2a0ac08864a9c0f2a3bdc97cc56124cacc31ca24",
           approvedAmount: -1
         },
         daiCToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0x4cf50a690b9b0aa395fdbebb298ca5498577d516",
+          address: "0x0eac46c53b2decf47bf4557c5a3a9a8ab1697bd9",
           approvedAmount: -1
         },
         bankDaiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0x66d875cb74dd2c0f134b9eecb7a6fb9783e52f30",
+          address: "0xf0b5ad472e22e25e68c2d1db128292b0a2d5a2cb",
           approvedAmount: -1
         },
         cdoToken: {
@@ -387,6 +388,7 @@ class App extends Component {
 
       this.setState({ profile }, () => {
         this.initializeSystemStatus();
+        this.setCDODetails();
         this.getBankDaiBalance()
         this.getBankDaiTotalSupply();
         this.getDaiTokenBalance();
@@ -731,6 +733,73 @@ class App extends Component {
       this.setState({ system }, () => {
       })
     })
+  }
+
+  getCDOAddress = (idx) => (
+    new Promise((resolve, reject) => {
+      this.bankDaiObj.cdoContractAddresses.call(idx, (e, r) => {
+        resolve(r);
+      })
+    })
+  )
+
+  getCDOTotalSupply = (cdo) => (
+    new Promise((resolve, reject) => {
+      cdo.totalSupply.call((e, r) => {
+        resolve(r);
+      })
+    })
+  )
+
+  getCDOUserBalance = (cdo, adr) => (
+    new Promise((resolve, reject) => {
+      console.log("cdo: ", cdo, "adr: ", adr)
+      cdo.balanceOf.call(adr, (e, r) => {
+        resolve(r);
+      })
+    })
+  )
+
+  setCDODetails = () => {
+    let currentBalance = web3.toBigNumber(0), currentTotalSupply = web3.toBigNumber(0), currentCDO;
+    let cdoPromise = (cdoAddr) => (
+      new Promise((resolve, reject) => {
+        resolve(this.loadObject(cdoToken.abi, cdoAddr))
+      })
+    )
+    let resolveCDO = (idx) => {
+      Promise
+        .resolve(this.getCDOAddress(idx))
+        .then(r => {
+          /* END CONDITION -- 0x means end of cdo address list! */
+          console.log("r: ", r)
+          if (r == '0x') {
+            let system = this.state.system;
+            system.cdoToken.myBalance = currentBalance;
+            system.cdoToken.totalSupply = currentTotalSupply;
+            console.log("totalSupply: ", system.cdoToken.totalSupply)
+            console.log("myBalance: ", system.cdoToken.myBalance)
+            this.setState({ system });
+          } else {
+            Promise.resolve(cdoPromise(r))
+              .then(cdoObj => {
+                currentCDO = cdoObj;
+                return this.getCDOTotalSupply(currentCDO);
+              })
+              .then(totSupply => {
+                currentTotalSupply = currentTotalSupply.plus(totSupply);
+                console.log("totSupply:", totSupply)
+                return this.getCDOUserBalance(currentCDO, this.state.profile.activeProfile);
+              })
+              .then(usrBal => {
+                currentBalance = currentBalance.plus(usrBal);
+              })
+              .then(zzz => { resolveCDO(++idx) })
+          }
+        })
+    };
+
+    resolveCDO(0);
   }
 
   setFilterToken = (token) => {
@@ -2149,7 +2218,7 @@ class App extends Component {
   }
 
   transferToken = (token, to, amount) => {
-    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI');
+    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken','DAI-C');
     const id = Math.random();
     const title = `${tokenName}: transfer ${to} ${amount}`;
     this.logRequestTransaction(id, title);
@@ -2226,11 +2295,12 @@ class App extends Component {
   }
 
   borrowRepay = (operation, amount, token) => {
+    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken','DAI-C');    
     const id = Math.random();
-    const title = `DAI: ${operation} ${amount}`;
+    const title = `${tokenName}: ${operation} ${amount}`;
 
     const approveId = Math.random();
-    const approveTitle = `Approving DAI: ${operation} ${amount}`;
+    const approveTitle = `Approving ${tokenName}: ${operation} ${amount}`;
 
     const log = (e, tx) => {
       if (!e) {
@@ -2252,13 +2322,13 @@ class App extends Component {
           this.logRequestTransaction(id, title);
           switch (token) {
             case 'daiToken':
-              this.bankDaiObj.repayment(web3.toWei(amount),0,0, log);
+              this.bankDaiObj.repayment(web3.toWei(amount), 0, 0, log);
               break;
             case 'bankDaiToken':
-              this.bankDaiObj.repayment(0,web3.toWei(amount),0, log);
+              this.bankDaiObj.repayment(0, web3.toWei(amount), 0, log);
               break;
             case 'daiCToken':
-              this.bankDaiObj.repayment(0,0,web3.toWei(amount), log);
+              this.bankDaiObj.repayment(0, 0, web3.toWei(amount), log);
               break;
             default:
               break;
@@ -2279,11 +2349,12 @@ class App extends Component {
   }
 
   buyDebt(amount, token, address) {
+    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken','DAI-C');    
     const id = Math.random();
-    const title = `Buy Debt: ${address} ${amount}`;
+    const title = `Buy Debt with ${tokenName}: ${address} ${amount}`;
 
     const approveId = Math.random();
-    const approveTitle = `Approving: ${token} ${amount}`;
+    const approveTitle = `Approving ${tokenName}: ${amount}`;
 
     const log = (e, tx) => {
       if (!e) {
@@ -2304,10 +2375,13 @@ class App extends Component {
         this.logRequestTransaction(id, title);
         switch (token) {
           case 'daiToken':
-            this.bankDaiObj.buyDebt(address,web3.toWei(amount),web3.toWei(amount),0, log);
+            this.bankDaiObj.buyDebt(address, web3.toWei(amount), web3.toWei(amount), 0, log);
             break;
           case 'bankDaiToken':
-            this.bankDaiObj.buyDebt(0,web3.toWei(amount),0,web3.toWei(amount), log);
+            this.bankDaiObj.buyDebt(0, web3.toWei(amount), 0, web3.toWei(amount), log);
+            break;
+          case 'bankDaiToken':
+            this.bankDaiObj.buyDebt(0, web3.toWei(amount), 0, web3.toWei(amount), log);
             break;
           default:
             break;

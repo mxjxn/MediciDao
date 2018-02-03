@@ -61,6 +61,7 @@ class BuyDebt extends Component {
                   <select ref={(input) => this.token = input} onChange={this.onChangeToken}>
                     <option value="daiToken">Dai</option>
                     <option value="bankDaiToken">Dai-B</option>
+                    <option value="daiCToken">Dai-C</option>
                   </select>
                   <input type="submit" />
                   {this.state.error ? this.renderError() : ''}

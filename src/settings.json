@@ -49,16 +49,16 @@
         "fromBlock":2574804
       },
       "DSTokenBase":{
-        "address":"0x2a0ac08864a9c0f2a3bdc97cc56124cacc31ca24",
-        "fromBlock":2572285
+        "address": "0x2a0ac08864a9c0f2a3bdc97cc56124cacc31ca24",
+        "fromBlock":2575053
       },
       "BankDaiToken":{
-        "address":"0xf0b5ad472e22e25e68c2d1db128292b0a2d5a2cb",
-        "fromBlock":2572270
+        "address": "0xf0b5ad472e22e25e68c2d1db128292b0a2d5a2cb",
+        "fromBlock":2575066
       },
       "DaiCToken": {
         "address": "0x0eac46c53b2decf47bf4557c5a3a9a8ab1697bd9",
-        "fromBlock": 2572324
+        "fromBlock": 2575085
       },
       "service": "",
       "chart": false,

@@ -11,11 +11,11 @@ class Transfer extends Component {
 
   fillTo = (e) => {
     e.preventDefault();
-    this.setState({ to: e.target.getAttribute('data-address')});
+    this.setState({ to: e.target.getAttribute('data-address') });
   }
 
   onChangeTo = () => {
-    this.setState({ to: this.to.value});
+    this.setState({ to: this.to.value });
   }
 
   transfer = (e) => {
@@ -41,7 +41,7 @@ class Transfer extends Component {
   renderError = () => {
     return (
       <p className="error">
-        { this.state.error }
+        {this.state.error}
       </p>
     )
   }
@@ -57,33 +57,35 @@ class Transfer extends Component {
             <div className="col-md-12">
               <div>
                 <form className="transfer" ref={(input) => this.transferForm = input} onSubmit={(e) => this.transfer(e)}>
-                  <label>Token</label>
-                  <select ref={(input) => this.token = input} >
-                    <option value="bankDaiToken">Dai-B</option>
-                    <option value="daiToken">Dai</option>
-                  </select>
+
                   {
                     settings.chain[this.props.network].proxyFactory
-                    ? <label>&nbsp;</label>
-                    : ''
+                      ? <label>&nbsp;</label>
+                      : ''
                   }
                   {
                     settings.chain[this.props.network].proxyFactory
-                    ?
+                      ?
                       this.props.profile.mode === 'proxy'
-                      ? <a href="#acction" data-address={ this.props.account } onClick={ this.fillTo }>Send to your main account</a>
-                      : <a href="#acction" data-address={ this.props.profile.proxy } onClick={ this.fillTo }>Send to your proxy profile</a>
-                    :
+                        ? <a href="#acction" data-address={this.props.account} onClick={this.fillTo}>Send to your main account</a>
+                        : <a href="#acction" data-address={this.props.profile.proxy} onClick={this.fillTo}>Send to your proxy profile</a>
+                      :
                       ''
                   }
                   <label>
                     To
                   </label>
-                  <input ref={(input) => this.to = input} value={ this.state.to } onChange={ this.onChangeTo } type="text" placeholder="0x" />
+                  <input ref={(input) => this.to = input} value={this.state.to} onChange={this.onChangeTo} type="text" placeholder="0x" />
                   <label>Amount</label>
                   <input ref={(input) => this.amount = input} type="number" placeholder="0.00" step="0.000000000000000001" />
+                  <label>Token</label>
+                  <select ref={(input) => this.token = input} >
+                    <option value="daiToken">Dai</option>
+                    <option value="bankDaiToken">Dai-B</option>
+                    <option value="daiToken">Dai-C</option>
+                  </select>
                   <input type="submit" />
-                  { this.state.error ? this.renderError() : '' }
+                  {this.state.error ? this.renderError() : ''}
                 </form>
               </div>
             </div>
