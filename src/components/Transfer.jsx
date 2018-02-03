@@ -83,6 +83,7 @@ class Transfer extends Component {
                     <option value="daiToken">Dai</option>
                     <option value="bankDaiToken">Dai-B</option>
                     <option value="daiToken">Dai-C</option>
+                    <option value="cdoToken">CDO</option>
                   </select>
                   <input type="submit" />
                   {this.state.error ? this.renderError() : ''}
