@@ -133,7 +133,7 @@ class App extends Component {
         daiCToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address:"0x4cf50a690b9b0aa395fdbebb298ca5498577d516",
+          address: "0x4cf50a690b9b0aa395fdbebb298ca5498577d516",
           approvedAmount: -1
         },
         bankDaiToken: {
