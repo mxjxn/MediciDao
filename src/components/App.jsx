@@ -686,7 +686,7 @@ class App extends Component {
       })
     })
   }
-  
+
   getDaiTokenBalance = () => {
     if (web3.isAddress(this.state.profile.activeProfile)) {
       this.daiTokenObj.balanceOf.call(this.state.profile.activeProfile, (e, r) => {
@@ -2191,7 +2191,7 @@ class App extends Component {
       // } else {
       this.daiTokenObj.approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
         if (!e) {
-          alert(tx)
+          // alert(tx)
           this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
           this.logRequestTransaction(id, title);
           this.bankDaiObj.deposit(web3.toWei(amount), log);
@@ -2210,7 +2210,7 @@ class App extends Component {
       // } else {
       this.bankDaiTokenObj.approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
         if (!e) {
-          alert(tx)
+          // alert(tx)
           this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
           this.logRequestTransaction(id, title);
           this.bankDaiObj.withdrawal(web3.toWei(amount), log);
@@ -2225,7 +2225,7 @@ class App extends Component {
     }
   }
 
-  borrowRepay = (operation, amount) => {
+  borrowRepay = (operation, amount, token) => {
     const id = Math.random();
     const title = `DAI: ${operation} ${amount}`;
 
@@ -2245,12 +2245,24 @@ class App extends Component {
 
     if (operation === 'repay') {
       this.logRequestTransaction(approveId, approveTitle);
-      this.daiTokenObj.approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+      this[`${token}Obj`].approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
         if (!e) {
-          alert(tx)
+          // alert(tx)
           this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
           this.logRequestTransaction(id, title);
-          this.bankDaiObj.repayment(web3.toWei(amount), log);
+          switch (token) {
+            case 'daiToken':
+              this.bankDaiObj.repayment(web3.toWei(amount),0,0, log);
+              break;
+            case 'bankDaiToken':
+              this.bankDaiObj.repayment(0,web3.toWei(amount),0, log);
+              break;
+            case 'daiCToken':
+              this.bankDaiObj.repayment(0,0,web3.toWei(amount), log);
+              break;
+            default:
+              break;
+          }
         } else {
           alert('ERROR' + e)
           console.log(e);
@@ -2258,7 +2270,7 @@ class App extends Component {
         }
       })
     } else if (operation === 'borrow') {
-      alert('borrowing')
+      // alert('borrowing')
       this.logRequestTransaction(id, title);
       this.bankDaiObj.credit(web3.toWei(amount), log);
       // this.bankDaiObj.setApprovedBorrowerAmount(this.state.profile.activeProfile,web3.toWei(amount), 'test', 'DAI', 0, 0, log);
@@ -2266,8 +2278,47 @@ class App extends Component {
     }
   }
 
-  buyDebt(amount) {
-    alert('you\'re buying ' + amount + ' debt');
+  buyDebt(amount, token, address) {
+    const id = Math.random();
+    const title = `Buy Debt: ${address} ${amount}`;
+
+    const approveId = Math.random();
+    const approveTitle = `Approving: ${token} ${amount}`;
+
+    const log = (e, tx) => {
+      if (!e) {
+        // alert(tx)
+        this.logPendingTransaction(id, tx, title, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
+      } else {
+        alert('ERROR' + e)
+        console.log(e);
+        this.logTransactionRejected(id, title);
+      }
+    }
+
+    this.logRequestTransaction(approveId, approveTitle);
+    this[`${token}Obj`].approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+      if (!e) {
+        // alert(tx)
+        this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
+        this.logRequestTransaction(id, title);
+        switch (token) {
+          case 'daiToken':
+            this.bankDaiObj.buyDebt(address,web3.toWei(amount),web3.toWei(amount),0, log);
+            break;
+          case 'bankDaiToken':
+            this.bankDaiObj.buyDebt(0,web3.toWei(amount),0,web3.toWei(amount), log);
+            break;
+          default:
+            break;
+        }
+      } else {
+        alert('ERROR' + e)
+        console.log(e);
+        this.logTransactionRejected(approveId, approveTitle);
+      }
+    })
+
   }
 
   approveDepositWithdraw(token, amount) {
@@ -2523,7 +2574,7 @@ class App extends Component {
                         <Transfer transferToken={this.transferToken} system={this.state.system} profile={this.state.profile} network={this.state.network.network} account={this.state.network.defaultAccount} />
                       </div>
                       <div className="col-md-6 col-sm-6">
-                        <BorrowRepay borrowRepay={this.borrowRepay} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
+                        <BorrowRepay bankDaiToken={this.state.system.bankDaiToken} daiCToken={this.state.system.daiCToken} daiToken={this.state.system.daiToken} borrowRepay={this.borrowRepay} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
                       </div>
                       <div className="col-md-6 col-sm-6">
                         <BuyDebt buyDebt={this.buyDebt} accountBalance={this.state.profile.accountBalance} system={this.state.system} />

@@ -4,21 +4,25 @@ import { printNumber } from '../helpers';
 
 class BorrowRepay extends Component {
   state = {
-    error: ''
+    error: '',
+    operation: '',
+    token:'daiToken'
   };
 
   borrowRepay = (e) => {
     e.preventDefault();
     const operation = this.operation.value;
-    const amount = this.amount.value
+    const amount = this.amount.value;
+    const token = this.state.token;
+
     this.setState({ error: '' });
 
     if (!amount) {
       this.setState({ error: 'Invalid Amount' });
-    } else if (operation === 'repay' && this.props.accountBalance.lt(web3.toWei(amount))) {
-      this.setState({ error: `Not enough balance to repay ${amount} DAI` });
+    } else if (operation === 'repay' && this.props[token].myBalance.lt(web3.toWei(amount))) {
+      this.setState({ error: `Not enough balance to repay ${amount} using ${token}` });
     } else {
-      this.props.borrowRepay(operation, amount);
+      this.props.borrowRepay(operation, amount, token);
       this.amount.value = '';
     }
   }
@@ -29,6 +33,14 @@ class BorrowRepay extends Component {
         {this.state.error}
       </p>
     )
+  }
+
+  onChangeOperation = () => {
+    this.setState({ operation: this.operation.value });
+  }
+
+  onChangeToken = () => {
+    this.setState({ token: this.token.value });
   }
 
   render = () => {
@@ -43,10 +55,24 @@ class BorrowRepay extends Component {
               <div>
                 <form className="transfer" ref={(input) => this.wrapUnwrapForm = input} onSubmit={(e) => this.borrowRepay(e)}>
                   <label>Operation</label>
-                  <select ref={(input) => this.operation = input} >
+                  <select ref={(input) => this.operation = input} onChange={this.onChangeOperation} >
                     <option value="borrow">Borrow</option>
                     <option value="repay">Repay</option>
                   </select>
+                  {
+                    this.state.operation === 'repay'
+                      ?
+                      <div>
+                        <label>Token</label>
+                        <select ref={(input) => this.token = input} onChange={this.onChangeToken}>
+                          <option value="daiToken">Dai</option>
+                          <option value="bankDaiToken">Dai-B</option>
+                          <option value="daiCToken">Dai-C</option>
+                        </select>
+                      </div>
+                      :
+                      ''
+                  }
                   <label>Amount</label>
                   <input ref={(input) => this.amount = input} type="number" placeholder="0.00" step="0.000000000000000001" />
                   <input type="submit" />
