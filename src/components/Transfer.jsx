@@ -85,7 +85,7 @@ class Transfer extends Component {
                     <option value="daiToken">Dai-C</option>
                     <option value="cdoToken">CDO</option>
                   </select>
-                  <input type="submit" />
+                  <input className="btn-success" type="submit" />
                   {this.state.error ? this.renderError() : ''}
                 </form>
               </div>

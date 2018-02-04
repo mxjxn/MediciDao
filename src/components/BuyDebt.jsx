@@ -67,7 +67,7 @@ class BuyDebt extends Component {
                     <option value="bankDaiToken">Dai-B</option>
                     <option value="daiCToken">Dai-C</option>
                   </select>
-                  <input type="submit" />
+                  <input className="btn-success" type="submit" />" />
                   {this.state.error ? this.renderError() : ''}
                 </form>
               </div>
