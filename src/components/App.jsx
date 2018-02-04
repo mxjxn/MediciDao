@@ -12,6 +12,7 @@ import TokenAllowance from './TokenAllowance';
 import PriceChart from './PriceChart';
 import SystemStatus from './SystemStatus';
 import BankStatus from './BankStatus';
+import BankControls from './BankControls'
 import Cups from './Cups';
 import Wrap from './Wrap';
 import BorrowRepay from './BorrowRepay';
@@ -32,6 +33,7 @@ const daiToken = require('../abi/daitoken.json');
 const bankDaiToken = require('../abi/bankDaiToken.json');
 const daiCToken = require('../abi/daiCToken.json');
 const cdoToken = require('../abi/cdoToken.json');
+const debtPurchaser = require('../abi/debtPurchaser.json');
 const tub = require('../abi/saitub');
 const top = require('../abi/saitop');
 const tap = require('../abi/saitap');
@@ -147,6 +149,9 @@ class App extends Component {
           myBalance: web3.toBigNumber(0),
           totalSupply: web3.toBigNumber(0),
           address: "",
+        },
+        debtPurchaser:{
+          address: "0x218fA415A0995A3b513694cf6c1460cBB6FdF90C"
         },
         tap: {
           address: null,
@@ -294,7 +299,7 @@ class App extends Component {
     networkState.latestBlock = 0;
     this.setState({ network: networkState }, () => {
       const addrs = settings.chain[this.state.network.network];
-      this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address);
+      this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
     });
   }
 
@@ -364,7 +369,7 @@ class App extends Component {
     })
   }
 
-  initContracts = (bankDaiAddress, tokenAddress, bankTokenAddress, daiCTokenAddress) => {
+  initContracts = (bankDaiAddress, tokenAddress, bankTokenAddress, daiCTokenAddress, debtPurchaserAddress) => {
     if (!this.validateAddresses(bankDaiAddress) || !this.validateAddresses(tokenAddress) || !this.validateAddresses(bankTokenAddress) || !this.validateAddresses(daiCTokenAddress)) {
       return;
     }
@@ -380,6 +385,7 @@ class App extends Component {
       window.daiTokenObj = this.daiTokenObj = this.loadObject(daiToken.abi, tokenAddress);
       window.bankDaiTokenObj = this.bankDaiTokenObj = this.loadObject(bankDaiToken.abi, bankTokenAddress);
       window.daiCTokenObj = this.daiCTokenObj = this.loadObject(daiCToken.abi, daiCTokenAddress);
+      window.debtPurchaserObj = this.debtPurchaserObj = this.loadObject(debtPurchaser.abi, debtPurchaserAddress);
 
       const profile = { ...this.state.profile };
       profile.mode = 'account';
@@ -2218,7 +2224,7 @@ class App extends Component {
   }
 
   transferToken = (token, to, amount) => {
-    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken','DAI-C');
+    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken', 'DAI-C');
     const id = Math.random();
     const title = `${tokenName}: transfer ${to} ${amount}`;
     this.logRequestTransaction(id, title);
@@ -2295,7 +2301,7 @@ class App extends Component {
   }
 
   borrowRepay = (operation, amount, token) => {
-    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken','DAI-C');    
+    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken', 'DAI-C');
     const id = Math.random();
     const title = `${tokenName}: ${operation} ${amount}`;
 
@@ -2348,10 +2354,10 @@ class App extends Component {
     }
   }
 
-  buyDebt(amount, token, address) {
-    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken','DAI-C');    
+  buyDebt = (amount, token, address) =>{
+    const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken', 'DAI-C');
     const id = Math.random();
-    const title = `Buy Debt with ${tokenName}: ${address} ${amount}`;
+    const title = `Buy debt with ${tokenName}: ${amount}`;
 
     const approveId = Math.random();
     const approveTitle = `Approving ${tokenName}: ${amount}`;
@@ -2368,20 +2374,20 @@ class App extends Component {
     }
 
     this.logRequestTransaction(approveId, approveTitle);
-    this[`${token}Obj`].approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+    this[`${token}Obj`].approve(this.state.system.debtPurchaser.address, web3.toWei(amount), (e, tx) => {
       if (!e) {
         // alert(tx)
         this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
         this.logRequestTransaction(id, title);
         switch (token) {
           case 'daiToken':
-            this.bankDaiObj.buyDebt(address, web3.toWei(amount), web3.toWei(amount), 0, log);
+            this.debtPurchaserObj.buyDebt(address, web3.toWei(amount), web3.toWei(amount), 0, 0, log);
             break;
           case 'bankDaiToken':
-            this.bankDaiObj.buyDebt(0, web3.toWei(amount), 0, web3.toWei(amount), log);
+            this.debtPurchaserObj.buyDebt(address, web3.toWei(amount), 0, web3.toWei(amount), 0, log);
             break;
-          case 'bankDaiToken':
-            this.bankDaiObj.buyDebt(0, web3.toWei(amount), 0, web3.toWei(amount), log);
+          case 'daiCToken':
+            this.debtPurchaserObj.buyDebt(address, web3.toWei(amount), 0, 0, web3.toWei(amount), log);
             break;
           default:
             break;
@@ -2393,6 +2399,40 @@ class App extends Component {
       }
     })
 
+  }
+
+  getTotalLiquidity = () =>{
+    this.bankDaiObj.getTotalLiquidity.call( (e,r)=>{
+      if(!e){
+        alert('Response: '+r)
+      }
+      else{
+        alert('Error: '+e)
+      }
+    });
+  }
+
+  realizeCDOPaymentsAsThirdParty = () =>{
+    this.bankDaiObj.realizeCDOPaymentsAsThirdParty.call((e,r)=>{
+      if(!e){
+        alert('Response: '+r)
+      }
+      else{
+        alert('Error: '+e)
+      }
+      
+    });
+  }
+
+  collectInterest = () =>{
+    this.bankDaiObj.collectInterest.call((e,r)=>{
+      if(!e){
+        alert('Response: '+r)
+      }
+      else{
+        alert('Error: '+e)
+      }
+    });
   }
 
   approveDepositWithdraw(token, amount) {
@@ -2622,19 +2662,22 @@ class App extends Component {
               <Token system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='dai' color='bg-green' actions={daiActions} handleOpenModal={this.handleOpenModal} />
               <Token system={ this.state.system } network={ this.state.network.network } account={ this.state.network.defaultAccount } token='sin' color='bg-red' />
               */}
-              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiToken' color='bg-aqua' />
+              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiToken' color='bg-gray' />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='bankDaiToken' color='bg-green' />
-              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiCToken' color='bg-green' />
+              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiCToken' color='bg-orange' />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='cdoToken' color='bg-aqua' />
             </div>
             <div className="row">
-              <div className="col-md-12">
+              <div className="col-md-6">
                 {
                   settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
                     ? <PriceChart chartData={this.state.system.chartData} />
                     : ''
                 }
                 <BankStatus system={this.state.system} actions={bustBoomActions} handleOpenModal={this.handleOpenModal} service={settings.chain[this.state.network.network].service} stats={this.state.system.stats} />
+              </div>
+              <div className="col-md-6">
+                <BankControls getTotalLiquidity={this.getTotalLiquidity} collectInterest={this.collectInterest} realizeCDOPaymentsAsThirdParty={this.realizeCDOPaymentsAsThirdParty}/>
               </div>
               <div className="col-md-12">
                 {
@@ -2651,7 +2694,7 @@ class App extends Component {
                         <BorrowRepay bankDaiToken={this.state.system.bankDaiToken} daiCToken={this.state.system.daiCToken} daiToken={this.state.system.daiToken} borrowRepay={this.borrowRepay} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
                       </div>
                       <div className="col-md-6 col-sm-6">
-                        <BuyDebt buyDebt={this.buyDebt} accountBalance={this.state.profile.accountBalance} system={this.state.system} />
+                        <BuyDebt buyDebt={this.buyDebt} accountBalance={this.state.profile.accountBalance} bankDaiToken={this.state.system.bankDaiToken} daiCToken={this.state.system.daiCToken} daiToken={this.state.system.daiToken} system={this.state.system} />
                       </div>
                     </div>
                     :

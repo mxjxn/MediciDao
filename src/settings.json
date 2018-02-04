@@ -60,6 +60,10 @@
         "address": "0x0eac46c53b2decf47bf4557c5a3a9a8ab1697bd9",
         "fromBlock": 2575085
       },
+      "DebtPurchaser":{
+        "address": "0x218fA415A0995A3b513694cf6c1460cBB6FdF90C",
+        "fromBlock": 2582147
+      },
       "service": "",
       "chart": false,
       "proxyFactory": "",

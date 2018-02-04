@@ -32,6 +32,10 @@ class BuyDebt extends Component {
     this.setState({token: this.token.value})
   }
 
+  onChangeCDO = () => {
+    this.setState({cdo: this.cdo.value})
+  }
+
   renderError = () => {
     return (
       <p className="error">
@@ -54,7 +58,7 @@ class BuyDebt extends Component {
                   <label>
                     CDO
                   </label>
-                  <input ref={(input) => this.cdo = input} value={this.state.cdo} onChange={this.onChangeTo} type="text" placeholder="0x" />
+                  <input ref={(input) => this.cdo = input} value={this.state.cdo} onChange={this.onChangeCDO} type="text" placeholder="0x" />
                   <label>Amount</label>
                   <input ref={(input) => this.amount = input} type="number" placeholder="0.00" step="0.000000000000000001" />
                   <label>Token</label>
