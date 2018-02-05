@@ -386,10 +386,6 @@ a.resource {
    display: flex;
  }
 
- .test{
-   min-height: 250px;
- }
-
 a.resource.buy-dai {
   background-color: #1ABC9C;
   border-color: #17A387;

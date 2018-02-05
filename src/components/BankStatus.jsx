@@ -52,7 +52,7 @@ class BankStatus extends Component {
                         ?
                         <span>
                           {
-                            print(this.props.system.bank.availableLiquidity)
+                            printNumber(this.props.system.bank.availableLiquidity)
                           }
                         </span>
                         :

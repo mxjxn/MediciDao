@@ -124,26 +124,26 @@ class App extends Component {
           address: null,
         },
         bankDai: {
-          address: "0xAed5F5D8Acf0078efA38CA68BF66234509eBD83a",
+          address: -1,
           daiTokenApproved: -1,
           bankDaiTokenApproved: -1
         },
         daiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0x2a0ac08864a9c0f2a3bdc97cc56124cacc31ca24",
+          address: -1,
           approvedAmount: -1
         },
         daiCToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0x0eac46c53b2decf47bf4557c5a3a9a8ab1697bd9",
+          address: -1,
           approvedAmount: -1
         },
         bankDaiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0xf0b5ad472e22e25e68c2d1db128292b0a2d5a2cb",
+          address: -1,
           approvedAmount: -1
         },
         cdoToken: {
@@ -152,7 +152,7 @@ class App extends Component {
           address: "",
         },
         debtPurchaser:{
-          address: "0x218fA415A0995A3b513694cf6c1460cBB6FdF90C"
+          address: -1
         },
         tap: {
           address: null,
@@ -300,7 +300,16 @@ class App extends Component {
     networkState.latestBlock = 0;
     this.setState({ network: networkState }, () => {
       const addrs = settings.chain[this.state.network.network];
-      this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
+      let system = {...this.state.system}
+      system.bankDai.address = addrs.BankDai.address;
+      system.daiToken.address = addrs.DSTokenBase.address;
+      system.bankDaiToken.address = addrs.BankDaiToken.address;
+      system.daiCToken.address = addrs.DaiCToken.address;
+      system.debtPurchaser.address = addrs.DebtPurchaser.address;
+      this.setState({system}, ()=>{
+        alert('bankdaiAddress:'+this.state.system.bankDai.address)
+        this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
+      })
     });
   }
 
@@ -334,7 +343,16 @@ class App extends Component {
     this.setHashParams();
     window.onhashchange = () => {
       this.setHashParams();
-      this.initContracts(this.state.system.bankDai.address, this.state.system.daiToken.address, this.state.system.bankDaiToken.address, this.state.system.daiCToken.address);
+      const addrs = settings.chain[this.state.network.network];
+      let system = {...this.state.system}
+      system.bankDai.address = addrs.BankDai.address;
+      system.daiToken.address = addrs.DSTokenBase.address;
+      system.bankDaiToken.address = addrs.BankDaiToken.address;
+      system.daiCToken.address = addrs.DaiCToken.address;
+      system.debtPurchaser.address = addrs.DebtPurchaser.address;
+      this.setState({ system }, ()=>{
+        this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
+      })
     }
 
     if (localStorage.getItem('termsModal')) {
@@ -373,7 +391,7 @@ class App extends Component {
   getOutstandingDebt = () =>{
     this.bankDaiObj.outstandingDebt(this.state.profile.activeProfile, (e,r)=>{
       if(!e){
-        const profile = {...this.state.profile};
+        let profile = {...this.state.profile};
         profile.outstandingDebt = r;
         this.setState({profile});
       }

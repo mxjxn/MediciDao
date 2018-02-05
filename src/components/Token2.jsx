@@ -65,7 +65,7 @@ const Token2 = (props) => {
                   ?
                   <AnimatedNumber
                   value={debt}
-                  title={formatNumber(token.totalSupply, 18)}
+                  title={formatNumber(debt, 18)}
                   formatValue={n => formatNumber(n, 3)}
                   className="printedNumber"
                   onClick={copyToClipboard} />
