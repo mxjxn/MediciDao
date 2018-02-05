@@ -56,6 +56,7 @@ class App extends Component {
         proxy: null,
         activeProfile: null,
         accountBalance: web3.toBigNumber(-1),
+        outstandingDebt: -1
       },
       transactions: {},
       termsModal: {
@@ -365,6 +366,16 @@ class App extends Component {
         const system = { ...this.state.system };
         system.bank[functionName] = r;
         this.setState({ system });
+      }
+    })
+  }
+
+  getOutstandingDebt = () =>{
+    this.bankDaiObj.outstandingDebt(this.state.profile.activeProfile, (e,r)=>{
+      if(!e){
+        const profile = {...this.state.profile};
+        profile.outstandingDebt = r;
+        this.setState({profile});
       }
     })
   }
@@ -1226,6 +1237,7 @@ class App extends Component {
     this.getBankData('interestRate');
     this.getBankData('claimPeriod');
     this.getBankData('claimPeriodNumber');
+    this.getOutstandingDebt();
     // this.getParameterFromTub('authority');
     // this.getParameterFromTub('off');
     // this.getParameterFromTub('out');
@@ -2354,7 +2366,7 @@ class App extends Component {
     }
   }
 
-  buyDebt = (amount, token, address) =>{
+  buyDebt = (amount, token, address) => {
     const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken', 'DAI-C');
     const id = Math.random();
     const title = `Buy debt with ${tokenName}: ${amount}`;
@@ -2401,38 +2413,51 @@ class App extends Component {
 
   }
 
-  getTotalLiquidity = () =>{
-    this.bankDaiObj.getTotalLiquidity.call( (e,r)=>{
-      if(!e){
-        alert('Response: '+r)
+  getTotalLiquidity = () => {
+    this.bankDaiObj.getTotalLiquidity.call((e, r) => {
+      if (!e) {
+        alert('Response: ' + r)
       }
-      else{
-        alert('Error: '+e)
+      else {
+        alert('Error: ' + e)
       }
     });
   }
 
-  realizeCDOPaymentsAsThirdParty = () =>{
-    this.bankDaiObj.realizeCDOPaymentsAsThirdParty.call((e,r)=>{
-      if(!e){
-        alert('Response: '+r)
+  realizeCDOPaymentsAsThirdParty = () => {
+    const id = Math.random();
+    const title = 'Collecting Interest';
+    this.logRequestTransaction(id, title);
+
+    const log = (e, tx) => {
+      if (!e) {
+        alert('Transaction: '+tx)
+        this.logPendingTransaction(id, tx, title);
+      } else {
+        console.log('ERROR'+e);
+        this.logTransactionRejected(id, title);
       }
-      else{
-        alert('Error: '+e)
-      }
-      
-    });
+    }
+
+    this.debtPurchaserObj.realizeCDOPaymentsAsThirdParty(log);
   }
 
-  collectInterest = () =>{
-    this.bankDaiObj.collectInterest.call((e,r)=>{
-      if(!e){
-        alert('Response: '+r)
+  collectInterest = () => {
+    const id = Math.random();
+    const title = 'Collecting Interest';
+    this.logRequestTransaction(id, title);
+
+    const log = (e, tx) => {
+      if (!e) {
+        alert('Transaction: '+tx)
+        this.logPendingTransaction(id, tx, title);
+      } else {
+        console.log('ERROR'+e);
+        this.logTransactionRejected(id, title);
       }
-      else{
-        alert('Error: '+e)
-      }
-    });
+    }
+
+    this.bankDaiObj.collectInterest(log);
   }
 
   approveDepositWithdraw(token, amount) {
@@ -2636,7 +2661,7 @@ class App extends Component {
       <div className="content-wrapper">
         <section className="content-header">
           <h1>
-            <a href="/" className="logo"><img src={"https://pbs.twimg.com/profile_images/947320958439907328/Z4_kzyML_400x400.jpg"} alt="Maker Dai Explorer" width="50" /> - Medici DAO Bank</a>
+            <a href="/" className="logo"><img src={"https://cdn-images-1.medium.com/max/1600/1*R2wtB9MD9TrX8Vv2NJBxLQ.png"} alt="Maker Dai Explorer" width="100" />BankDai</a>
           </h1>
         </section>
         <section className="content">
@@ -2664,21 +2689,23 @@ class App extends Component {
               */}
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiToken' color='bg-gray' />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='bankDaiToken' color='bg-green' />
-              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiCToken' color='bg-orange' />
+              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiCToken' color='bg-yellow' debt={this.state.profile.outstandingDebt} />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='cdoToken' color='bg-aqua' />
             </div>
             <div className="row">
-              <div className="col-md-6">
-                {
-                  settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
-                    ? <PriceChart chartData={this.state.system.chartData} />
-                    : ''
-                }
-                <BankStatus system={this.state.system} actions={bustBoomActions} handleOpenModal={this.handleOpenModal} service={settings.chain[this.state.network.network].service} stats={this.state.system.stats} />
-              </div>
-              <div className="col-md-6">
-                <BankControls getTotalLiquidity={this.getTotalLiquidity} collectInterest={this.collectInterest} realizeCDOPaymentsAsThirdParty={this.realizeCDOPaymentsAsThirdParty}/>
-              </div>
+              {/* <div className="flexBox"> */}
+                <div className="col-md-6">
+                  {
+                    settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
+                      ? <PriceChart chartData={this.state.system.chartData} />
+                      : ''
+                  }
+                  <BankStatus system={this.state.system} actions={bustBoomActions} handleOpenModal={this.handleOpenModal} service={settings.chain[this.state.network.network].service} stats={this.state.system.stats} />
+                </div>
+                <div className="col-md-6">
+                  <BankControls getTotalLiquidity={this.getTotalLiquidity} collectInterest={this.collectInterest} realizeCDOPaymentsAsThirdParty={this.realizeCDOPaymentsAsThirdParty} />
+                </div>
+              {/* </div> */}
               <div className="col-md-12">
                 {
                   web3.isAddress(this.state.network.defaultAccount)

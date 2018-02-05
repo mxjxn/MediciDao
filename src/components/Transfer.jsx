@@ -82,10 +82,9 @@ class Transfer extends Component {
                   <select ref={(input) => this.token = input} >
                     <option value="daiToken">Dai</option>
                     <option value="bankDaiToken">Dai-B</option>
-                    <option value="daiToken">Dai-C</option>
-                    <option value="cdoToken">CDO</option>
+                    <option value="daiCToken">Dai-C</option>
                   </select>
-                  <input className="btn-success" type="submit" />
+                  <input className="btn-primary" type="submit" />
                   {this.state.error ? this.renderError() : ''}
                 </form>
               </div>

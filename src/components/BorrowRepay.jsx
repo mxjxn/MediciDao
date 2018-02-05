@@ -75,7 +75,7 @@ class BorrowRepay extends Component {
                   }
                   <label>Amount</label>
                   <input ref={(input) => this.amount = input} type="number" placeholder="0.00" step="0.000000000000000001" />
-                  <input className="btn-success" type="submit" />
+                  <input className="btn-primary" type="submit" />
                   {this.state.error ? this.renderError() : ''}
                 </form>
               </div>

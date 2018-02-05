@@ -44,26 +44,26 @@ div#cups > .row > .col-md-12 > div {
 }
 
 .info-box {
-  min-height: 90px;
+  min-height: 60px;
   position: relative;
   overflow: hidden;
   padding-bottom: 5px;
 }
 
 .info-box.big {
-  min-height: 80px;
+  min-height: 100px;
 }
 
 .info-box-icon {
   font-size: 32px;
   height: 100%;
-  line-height: 90px;
+  line-height: 60px;
   position: absolute;
   text-transform: uppercase;
 }
 
 .info-box.big .info-box-icon {
-  line-height: 80px;
+  line-height: 100px;
 }
 
 .info-box-number {
@@ -79,7 +79,7 @@ div#cups > .row > .col-md-12 > div {
 .info-box-number >span:first-child {
   clear: left;
   float: left;
-  width: 80px;
+  width: 150px;
 }
 
 .info-box-icon a {
@@ -258,6 +258,10 @@ p.error {
   color: #00a65a;
 }
 
+.blue-color{
+  color:rgba(33, 150, 243, 0.9)
+}
+
 .printedNumber {
   cursor: pointer;
 }
@@ -376,6 +380,14 @@ a.resource {
   margin-bottom: 10px;
   overflow: hidden;
   padding: 8px 20px;
+ }
+
+ .flexBox{
+   display: flex;
+ }
+
+ .test{
+   min-height: 250px;
  }
 
 a.resource.buy-dai {
@@ -675,7 +687,8 @@ a.buttonAction span {
 }
 
 .buttonContainer{
-  margin: auto;
+  margin-left:25%;
+  margin-right: 25%;
   width: 50%;
 }
 

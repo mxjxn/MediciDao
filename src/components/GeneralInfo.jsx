@@ -51,10 +51,10 @@ class GeneralInfo extends Component {
                 <span>Show</span><span>Hide</span> contracts addresses
               </a>
               <div id="collapseAddresses" className="panel-collapse collapse" aria-expanded="false" style={{ height: "0px" }}>
+                <div><strong>Bank:</strong> { etherscanAddress(this.props.network, this.props.bankDai, this.props.bankDai) }</div>
                 <div><strong>Dai:</strong> { etherscanAddress(this.props.network, this.props.dai, this.props.dai) }</div>
-                <div><strong>BankDai:</strong> { etherscanAddress(this.props.network, this.props.bankDai, this.props.bankDai) }</div>
-                <div><strong>BankDaiToken:</strong> { etherscanAddress(this.props.network, this.props.bankDaiToken, this.props.bankDaiToken) }</div>
-                <div><strong>DaiCToken:</strong> { etherscanAddress(this.props.network, this.props.daiCToken, this.props.daiCToken) }</div>
+                <div><strong>Dai-B:</strong> { etherscanAddress(this.props.network, this.props.bankDaiToken, this.props.bankDaiToken) }</div>
+                <div><strong>Dai-C:</strong> { etherscanAddress(this.props.network, this.props.daiCToken, this.props.daiCToken) }</div>
               </div>
             </div>
             {/* <div className="col-md-6">
