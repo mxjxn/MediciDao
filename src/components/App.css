@@ -700,15 +700,17 @@ a.buttonAction span {
   -webkit-box-shadow: 0 0 1px rgba(255,255,255,.3);
 }
 
-.flex-container {
-  display: flex;
-  align-items: stretch;
-}
+@media (min-width: 992px) {
+  .flex-container {
+    display: flex;
+    align-items: stretch;
+  }
 
-.flex-container .flex2 {
-  flex: 2;
-}
+  .flex-container .flex2 {
+    flex: 2;
+  }
 
-.flex-container .flex1 {
-  flex: 1;
+  .flex-container .flex1 {
+    flex: 1;
+  }
 }
