@@ -699,3 +699,16 @@ a.buttonAction span {
   background-color: rgba(0,0,0,.3);
   -webkit-box-shadow: 0 0 1px rgba(255,255,255,.3);
 }
+
+.flex-container {
+  display: flex;
+  align-items: stretch;
+}
+
+.flex-container .flex2 {
+  flex: 2;
+}
+
+.flex-container .flex1 {
+  flex: 1;
+}

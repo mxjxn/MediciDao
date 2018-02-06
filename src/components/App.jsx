@@ -2732,8 +2732,8 @@ class App extends Component {
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiCToken' color='bg-yellow' debt={this.state.profile.outstandingDebt} />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='cdoToken' color='bg-aqua' />
             </div>
-            <div className="row">
-              <div className="col-md-9">
+            <div className="row flex-container">
+              <div className="col-md-9 flex2">
                 {
                   settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
                     ? <PriceChart chartData={this.state.system.chartData} />
@@ -2744,7 +2744,15 @@ class App extends Component {
                             handleOpenModal={this.handleOpenModal}
                             service={settings.chain[this.state.network.network].service}
                             stats={this.state.system.stats} />
-                <CDOStatus system={this.state.system} />
+              </div>
+              <div className="col-md-3 flex1">
+                <BankControls getTotalLiquidity={this.getTotalLiquidity}
+                              collectInterest={this.collectInterest}
+                              realizeCDOPaymentsAsThirdParty={this.realizeCDOPaymentsAsThirdParty}/>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-12">
                 {
                   web3.isAddress(this.state.network.defaultAccount)
                     ?
@@ -2765,37 +2773,10 @@ class App extends Component {
                     :
                     ''
                 }
-              </div>
-              <div className="col-md-3">
-                <BankControls getTotalLiquidity={this.getTotalLiquidity}
-                              collectInterest={this.collectInterest}
-                              realizeCDOPaymentsAsThirdParty={this.realizeCDOPaymentsAsThirdParty}/>
-              </div>
-              <div className="col-md-3 right-sidebar">
-                {/* <div className="box">
-                  <div className="box-header with-border">
-                    <h3 className="box-title">General Actions</h3>
-                  </div>
-                  <div className="box-body">
-                    <div className="row">
-                      <div className="col-md-12">
-                        {
-                          Object.keys(actions).map(key =>
-                            <span key={ key } style={ {textTransform: 'capitalize'} }>
-                              { actions[key].active
-                                  ? <a href="#action" data-method={ key } onClick={ this.handleOpenModal } title={ actions[key].helper }>{ actions[key].display }</a>
-                                  : <span title={ actions[key].helper }>{ actions[key].display }</span> }
-                              { Object.keys(actions).pop() !== key ? <span> / </span> : '' }
-                            </span>
-                          )
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
-
+                <CDOStatus system={this.state.system} />
               </div>
             </div>
+              
           </div>
           <TermsModal modal={this.state.termsModal} markAsAccepted={this.markAsAccepted} />
           <VideoModal modal={this.state.videoModal} termsModal={this.state.termsModal} handleCloseVideoModal={this.handleCloseVideoModal} />
