@@ -57,6 +57,7 @@ class App extends Component {
         proxy: null,
         activeProfile: null,
         accountBalance: web3.toBigNumber(-1),
+        outstandingDebt: -1
       },
       transactions: {},
       termsModal: {
@@ -124,26 +125,26 @@ class App extends Component {
           address: null,
         },
         bankDai: {
-          address: "0xAed5F5D8Acf0078efA38CA68BF66234509eBD83a",
+          address: -1,
           daiTokenApproved: -1,
           bankDaiTokenApproved: -1
         },
         daiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0x2a0ac08864a9c0f2a3bdc97cc56124cacc31ca24",
+          address: -1,
           approvedAmount: -1
         },
         daiCToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0x0eac46c53b2decf47bf4557c5a3a9a8ab1697bd9",
+          address: -1,
           approvedAmount: -1
         },
         bankDaiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: "0xf0b5ad472e22e25e68c2d1db128292b0a2d5a2cb",
+          address: -1,
           approvedAmount: -1
         },
         cdoToken: {
@@ -153,7 +154,7 @@ class App extends Component {
           tableData: []
         },
         debtPurchaser:{
-          address: "0x218fA415A0995A3b513694cf6c1460cBB6FdF90C"
+          address: -1
         },
         tap: {
           address: null,
@@ -301,7 +302,15 @@ class App extends Component {
     networkState.latestBlock = 0;
     this.setState({ network: networkState }, () => {
       const addrs = settings.chain[this.state.network.network];
-      this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
+      let system = {...this.state.system}
+      system.bankDai.address = addrs.BankDai.address;
+      system.daiToken.address = addrs.DSTokenBase.address;
+      system.bankDaiToken.address = addrs.BankDaiToken.address;
+      system.daiCToken.address = addrs.DaiCToken.address;
+      system.debtPurchaser.address = addrs.DebtPurchaser.address;
+      this.setState({system}, ()=>{
+        this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
+      })
     });
   }
 
@@ -335,7 +344,16 @@ class App extends Component {
     this.setHashParams();
     window.onhashchange = () => {
       this.setHashParams();
-      this.initContracts(this.state.system.bankDai.address, this.state.system.daiToken.address, this.state.system.bankDaiToken.address, this.state.system.daiCToken.address);
+      const addrs = settings.chain[this.state.network.network];
+      let system = {...this.state.system}
+      system.bankDai.address = addrs.BankDai.address;
+      system.daiToken.address = addrs.DSTokenBase.address;
+      system.bankDaiToken.address = addrs.BankDaiToken.address;
+      system.daiCToken.address = addrs.DaiCToken.address;
+      system.debtPurchaser.address = addrs.DebtPurchaser.address;
+      this.setState({ system }, ()=>{
+        this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
+      })
     }
 
     if (localStorage.getItem('termsModal')) {
@@ -363,10 +381,19 @@ class App extends Component {
   getBankData = (functionName) => {
     this.bankDaiObj[`${functionName}`].call((e, r) => {
       if (!e) {
-        // alert('response:' + r)
         const system = { ...this.state.system };
         system.bank[functionName] = r;
         this.setState({ system });
+      }
+    })
+  }
+
+  getOutstandingDebt = () =>{
+    this.bankDaiObj.outstandingDebt(this.state.profile.activeProfile, (e,r)=>{
+      if(!e){
+        let profile = {...this.state.profile};
+        profile.outstandingDebt = r;
+        this.setState({profile});
       }
     })
   }
@@ -681,7 +708,6 @@ class App extends Component {
           let daiCToken = system.daiCToken;
           daiCToken.myBalance = r;
           this.setState({ system }, () => {
-            //alert( 'dai balance: ' + this.state.system.daiToken.myBalance);
           })
         }
       })
@@ -705,7 +731,6 @@ class App extends Component {
           let daiToken = system.daiToken;
           daiToken.myBalance = r;
           this.setState({ system }, () => {
-            //alert( 'dai balance: ' + this.state.system.daiToken.myBalance);
           })
         }
       })
@@ -1249,7 +1274,6 @@ class App extends Component {
         else {
           system[spender].approvedAmount = r;
         }
-        // alert(spender+': approved to spend '+JSON.stringify(system[spender])+' of '+token)
         return { system };
       });
     }, () => { });
@@ -1276,7 +1300,6 @@ class App extends Component {
   getBalanceOf = (name, address, field) => {
     this[`${name}Obj`].balanceOf.call(address, (e, r) => {
       if (!e) {
-        // alert(name+' balance: ='+r)
         this.setState((prevState, props) => {
           const system = { ...prevState.system };
           const tok = { ...system[name] };
@@ -1298,6 +1321,7 @@ class App extends Component {
     this.getBankData('interestRate');
     this.getBankData('claimPeriod');
     this.getBankData('claimPeriodNumber');
+    this.getOutstandingDebt();
     // this.getParameterFromTub('authority');
     // this.getParameterFromTub('off');
     // this.getParameterFromTub('out');
@@ -2324,7 +2348,6 @@ class App extends Component {
         // alert(tx)
         this.logPendingTransaction(id, tx, title, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
       } else {
-        alert('ERROR' + e)
         console.log(e);
         this.logTransactionRejected(id, title);
       }
@@ -2343,7 +2366,6 @@ class App extends Component {
           this.logRequestTransaction(id, title);
           this.bankDaiObj.deposit(web3.toWei(amount), log);
         } else {
-          alert('ERROR' + e)
           console.log(e);
           this.logTransactionRejected(approveId, approveTitle);
         }
@@ -2362,7 +2384,6 @@ class App extends Component {
           this.logRequestTransaction(id, title);
           this.bankDaiObj.withdrawal(web3.toWei(amount), log);
         } else {
-          alert('ERROR' + e)
           console.log(e);
           this.logTransactionRejected(approveId, approveTitle);
         }
@@ -2385,7 +2406,6 @@ class App extends Component {
         // alert(tx)
         this.logPendingTransaction(id, tx, title, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
       } else {
-        alert('ERROR' + e)
         console.log(e);
         this.logTransactionRejected(id, title);
       }
@@ -2412,7 +2432,6 @@ class App extends Component {
               break;
           }
         } else {
-          alert('ERROR' + e)
           console.log(e);
           this.logTransactionRejected(approveId, approveTitle);
         }
@@ -2426,7 +2445,7 @@ class App extends Component {
     }
   }
 
-  buyDebt = (amount, token, address) =>{
+  buyDebt = (amount, token, address) => {
     const tokenName = token.replace('bankDaiToken', 'DAI-B').replace('daiToken', 'DAI').replace('daiCToken', 'DAI-C');
     const id = Math.random();
     const title = `Buy debt with ${tokenName}: ${amount}`;
@@ -2439,7 +2458,6 @@ class App extends Component {
         // alert(tx)
         this.logPendingTransaction(id, tx, title, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
       } else {
-        alert('ERROR' + e)
         console.log(e);
         this.logTransactionRejected(id, title);
       }
@@ -2465,7 +2483,6 @@ class App extends Component {
             break;
         }
       } else {
-        alert('ERROR' + e)
         console.log(e);
         this.logTransactionRejected(approveId, approveTitle);
       }
@@ -2473,38 +2490,49 @@ class App extends Component {
 
   }
 
-  getTotalLiquidity = () =>{
-    this.bankDaiObj.getTotalLiquidity.call( (e,r)=>{
-      if(!e){
-        alert('Response: '+r)
+  getTotalLiquidity = () => {
+    this.bankDaiObj.getTotalLiquidity.call((e, r) => {
+      if (!e) {
+        // alert('Response: ' + r)
       }
-      else{
-        alert('Error: '+e)
+      else {
+        // alert('Error: ' + e)
       }
     });
   }
 
-  realizeCDOPaymentsAsThirdParty = () =>{
-    this.bankDaiObj.realizeCDOPaymentsAsThirdParty.call((e,r)=>{
-      if(!e){
-        alert('Response: '+r)
+  realizeCDOPaymentsAsThirdParty = () => {
+    const id = Math.random();
+    const title = 'Collecting Interest';
+    this.logRequestTransaction(id, title);
+
+    const log = (e, tx) => {
+      if (!e) {
+        this.logPendingTransaction(id, tx, title);
+      } else {
+        console.log('ERROR'+e);
+        this.logTransactionRejected(id, title);
       }
-      else{
-        alert('Error: '+e)
-      }
-      
-    });
+    }
+
+    this.debtPurchaserObj.realizeCDOPaymentsAsThirdParty(log);
   }
 
-  collectInterest = () =>{
-    this.bankDaiObj.collectInterest.call((e,r)=>{
-      if(!e){
-        alert('Response: '+r)
+  collectInterest = () => {
+    const id = Math.random();
+    const title = 'Collecting Interest';
+    this.logRequestTransaction(id, title);
+
+    const log = (e, tx) => {
+      if (!e) {
+        this.logPendingTransaction(id, tx, title);
+      } else {
+        console.log('ERROR'+e);
+        this.logTransactionRejected(id, title);
       }
-      else{
-        alert('Error: '+e)
-      }
-    });
+    }
+
+    this.bankDaiObj.collectInterest(log);
   }
 
   approveDepositWithdraw(token, amount) {
@@ -2708,7 +2736,7 @@ class App extends Component {
       <div className="content-wrapper">
         <section className="content-header">
           <h1>
-            <a href="/" className="logo"><img src={"https://pbs.twimg.com/profile_images/947320958439907328/Z4_kzyML_400x400.jpg"} alt="Maker Dai Explorer" width="50" /> - Medici DAO Bank</a>
+            <a href="/" className="logo"><img src={"https://cdn-images-1.medium.com/max/1600/1*R2wtB9MD9TrX8Vv2NJBxLQ.png"} alt="Maker Dai Explorer" width="100" />BankDai</a>
           </h1>
         </section>
         <section className="content">
@@ -2736,7 +2764,7 @@ class App extends Component {
               */}
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiToken' color='bg-gray' />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='bankDaiToken' color='bg-green' />
-              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiCToken' color='bg-orange' />
+              <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='daiCToken' color='bg-yellow' debt={this.state.profile.outstandingDebt} />
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='cdoToken' color='bg-aqua' />
             </div>
             <div className="row">

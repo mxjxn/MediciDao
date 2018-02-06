@@ -1,6 +1,20 @@
 {
   "abi": [
     {
+      "constant": true,
+      "inputs": [],
+      "name": "debtPurchaserAddress",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "constant": false,
       "inputs": [
         {
@@ -30,6 +44,29 @@
       ],
       "payable": false,
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_daiAmount",
+          "type": "uint256"
+        },
+        {
+          "name": "_bankDaiAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "repayment",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -88,37 +125,6 @@
         }
       ],
       "name": "setClaimPeriodNumber",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
-      "name": "getTotalLiquidity",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_daiTokenAddress",
-          "type": "address"
-        },
-        {
-          "name": "_bankDaiTokenAddress",
-          "type": "address"
-        },
-        {
-          "name": "_bankDaiCreditAddress",
-          "type": "address"
-        }
-      ],
-      "name": "setTokenAddresses",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
@@ -256,6 +262,32 @@
           "type": "bool"
         }
       ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_daiTokenAddress",
+          "type": "address"
+        },
+        {
+          "name": "_bankDaiTokenAddress",
+          "type": "address"
+        },
+        {
+          "name": "_bankDaiCreditAddress",
+          "type": "address"
+        },
+        {
+          "name": "_debtPurchaserAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setTokenAddresses",
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -410,25 +442,20 @@
       "constant": false,
       "inputs": [
         {
-          "name": "_daiTokenAmount",
+          "name": "_who",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
           "type": "uint256"
         },
         {
-          "name": "_bankDaiTokenAmount",
-          "type": "uint256"
-        },
-        {
-          "name": "_bankDaiCreditAmount",
-          "type": "uint256"
+          "name": "_cdoToken",
+          "type": "address"
         }
       ],
-      "name": "repayment",
-      "outputs": [
-        {
-          "name": "success",
-          "type": "bool"
-        }
-      ],
+      "name": "moveCDOUnits",
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"

@@ -24,13 +24,8 @@ class BankStatus extends Component {
 
   render = () => {
     return (
-      <div className="box collapsed">
-        <div className="box-header with-border"
-             data-toggle="collapse"
-             data-parent="#accordion"
-             href="#collapseStatus"
-             onClick={this.saveStorage}
-             aria-expanded={localStorage.getItem('statusCollapsed') !== 'true'}>
+      <div className="box collapsed test">
+        <div className="box-header with-border" data-toggle="collapse" data-parent="#accordion" href="#collapseStatus" onClick={this.saveStorage} aria-expanded={localStorage.getItem('statusCollapsed') !== 'true'}>
           <h3 className="box-title">Bank Status</h3>
         </div>
         <div id="collapseStatus"
@@ -48,7 +43,7 @@ class BankStatus extends Component {
                         ?
                         <span>
                           {
-                            print(this.props.system.bank.availableLiquidity)
+                            printNumber(this.props.system.bank.availableLiquidity)
                           }
                         </span>
                         :
@@ -87,7 +82,7 @@ class BankStatus extends Component {
                 </div>
                 <div>
                   <strong>Claim Period</strong>
-                  <span className={this.props.system.tub.off === true ? 'error-color' : 'success-color'}>
+                  <span className={this.props.system.tub.off === true ? 'error-color' : 'blue-color'}>
                   {
                     this.props.system.bank.claimPeriod !==-1
                       ?
@@ -99,7 +94,7 @@ class BankStatus extends Component {
                 </div>
                 <div>
                   <strong>Claim Period Number</strong>
-                  <span className={this.props.system.tub.off === true ? 'error-color' : 'success-color'}>
+                  <span className={this.props.system.tub.off === true ? 'error-color' : 'blue-color'}>
                   {
                     this.props.system.bank.claimPeriodNumber !==-1
                       ?
@@ -110,7 +105,7 @@ class BankStatus extends Component {
                   </span>
                 </div>
               </div>
-              <div className="more" style={{ display: this.state.viewMore ? 'block' : 'none' }}>
+              {/* <div className="more" style={{ display: this.state.viewMore ? 'block' : 'none' }}>
                 <div>
                   <strong title="Price of 1 ETH in USD (as determined by the median of the feeds)">ETH/USD</strong>
                   {
@@ -260,12 +255,12 @@ class BankStatus extends Component {
                     ? <Stats stats={this.props.stats} />
                     : ''
                 }
-              </div>
-              {
+              </div> */}
+              {/* {
                 this.state.viewMore
                   ? <a className="more-link" href="#action" onClick={this.hide}>Hide</a>
                   : <a className="more-link" href="#action" onClick={this.viewMore}>View More</a>
-              }
+              } */}
             </div>
           </div>
         </div>
