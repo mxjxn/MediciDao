@@ -1,5 +1,15 @@
-
 {"abi": [{
+    "constant": true,
+    "inputs": [],
+    "name": "originalIssued",
+    "outputs": [{
+        "name": "",
+        "type": "uint256"
+    }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+}, {
     "constant": true,
     "inputs": [],
     "name": "frozen",
@@ -25,6 +35,17 @@
     "constant": true,
     "inputs": [],
     "name": "minter",
+    "outputs": [{
+        "name": "",
+        "type": "address"
+    }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "constant": true,
+    "inputs": [],
+    "name": "bankContract",
     "outputs": [{
         "name": "",
         "type": "address"
@@ -93,6 +114,28 @@
     "type": "function"
 }, {
     "constant": true,
+    "inputs": [],
+    "name": "date",
+    "outputs": [{
+        "name": "",
+        "type": "uint256"
+    }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "constant": false,
+    "inputs": [{
+        "name": "_bankContract",
+        "type": "address"
+    }],
+    "name": "changeBankContract",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "constant": true,
     "inputs": [{
         "name": "_owner",
         "type": "address"
@@ -119,6 +162,17 @@
 }, {
     "constant": true,
     "inputs": [],
+    "name": "owner",
+    "outputs": [{
+        "name": "",
+        "type": "address"
+    }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "constant": true,
+    "inputs": [],
     "name": "symbol",
     "outputs": [{
         "name": "",
@@ -139,17 +193,6 @@
     "stateMutability": "nonpayable",
     "type": "function"
 }, {
-    "constant": true,
-    "inputs": [],
-    "name": "hedgeContract",
-    "outputs": [{
-        "name": "",
-        "type": "address"
-    }],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-}, {
     "constant": false,
     "inputs": [{
         "name": "_to",
@@ -165,6 +208,17 @@
     }],
     "payable": false,
     "stateMutability": "nonpayable",
+    "type": "function"
+}, {
+    "constant": true,
+    "inputs": [],
+    "name": "interest",
+    "outputs": [{
+        "name": "",
+        "type": "uint256"
+    }],
+    "payable": false,
+    "stateMutability": "view",
     "type": "function"
 }, {
     "constant": true,
@@ -184,6 +238,28 @@
     "stateMutability": "view",
     "type": "function"
 }, {
+    "constant": true,
+    "inputs": [],
+    "name": "outstanding",
+    "outputs": [{
+        "name": "",
+        "type": "uint256"
+    }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+}, {
+    "constant": false,
+    "inputs": [{
+        "name": "newOwner",
+        "type": "address"
+    }],
+    "name": "transferOwnership",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+}, {
     "inputs": [{
         "name": "_name",
         "type": "string"
@@ -194,8 +270,17 @@
         "name": "_decimals",
         "type": "uint256"
     }, {
-        "name": "_hedgeContract",
+        "name": "_bankContract",
         "type": "address"
+    }, {
+        "name": "_originalIssued",
+        "type": "uint256"
+    }, {
+        "name": "_interest",
+        "type": "uint256"
+    }, {
+        "name": "_date",
+        "type": "uint256"
     }],
     "payable": false,
     "stateMutability": "nonpayable",

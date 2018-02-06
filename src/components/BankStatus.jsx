@@ -25,30 +25,26 @@ class BankStatus extends Component {
   render = () => {
     return (
       <div className="box collapsed">
-        <div className="box-header with-border" data-toggle="collapse" data-parent="#accordion" href="#collapseStatus" onClick={this.saveStorage} aria-expanded={localStorage.getItem('statusCollapsed') !== 'true'}>
+        <div className="box-header with-border"
+             data-toggle="collapse"
+             data-parent="#accordion"
+             href="#collapseStatus"
+             onClick={this.saveStorage}
+             aria-expanded={localStorage.getItem('statusCollapsed') !== 'true'}>
           <h3 className="box-title">Bank Status</h3>
         </div>
-        <div id="collapseStatus" className={`box-body panel-collapse collapse${localStorage.getItem('statusCollapsed') !== 'true' ? ' in' : ''}`} aria-expanded={localStorage.getItem('statusCollapsed') !== 'true'} style={{ height: localStorage.getItem('statusCollapsed') !== 'true' ? "auto" : "0px" }}>
+        <div id="collapseStatus"
+             className={`box-body panel-collapse collapse${localStorage.getItem('statusCollapsed') !== 'true' ? ' in' : ''}`}
+             aria-expanded={localStorage.getItem('statusCollapsed') !== 'true'}
+             style={{ height: localStorage.getItem('statusCollapsed') !== 'true' ? "auto" : "0px" }}>
           <div className="row">
             <div className="col-md-12 system-status">
               <div className="main">
-                {/* <div>
-                  <strong>Status</strong>
-                  <span className={this.props.system.tub.off === true ? 'error-color' : 'success-color'}>
-                    {
-                      this.props.system.tub.off !== -1
-                        ?
-                        this.props.system.tub.off === false ? 'Active' : 'Inactive'
-                        :
-                        'Loading...'
-                    }
-                  </span>
-                </div> */}
                 <div>
                   <strong>Available Liquidity</strong>
                   <span>
                     {
-                      this.props.system.bank.availableLiquidity !==-1
+                      this.props.system.bank.availableLiquidity !== -1
                         ?
                         <span>
                           {

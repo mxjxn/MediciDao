@@ -32,7 +32,7 @@ class BankControls extends Component {
           <div className="row">
             <div className="col-md-12 system-status">
               <div className="main box-body" >
-                <div className="buttonContainer">
+                <div className="BankControls buttonContainer">
                   <button className="btn-control" onClick={this.props.getTotalLiquidity}>Update Total Liquidity</button>
                   <button className="btn-control" onClick={this.props.collectInterest}>Collect Interest</button>
                   <button className="btn-control" onClick={this.props.realizeCDOPaymentsAsThirdParty}>3rd Party Interest Collection</button>

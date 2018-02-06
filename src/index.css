@@ -3,3 +3,23 @@ body {
   padding: 0;
   /*font-family: sans-serif;*/
 }
+
+.BankControls.buttonContainer {
+  width:100%;
+}
+
+#CDOStatus thead th {
+  font-weight:700;
+  font-size:16px;
+  padding: 10px;
+
+}
+
+#CDOStatus table tbody td {
+  
+}
+#CDOStatus table tbody td {
+  font-size: 16px;
+  padding-left:10px;
+  border-right: 1px solid #ccc;
+}

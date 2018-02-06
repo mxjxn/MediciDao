@@ -19,6 +19,7 @@ import BorrowRepay from './BorrowRepay';
 import BuyDebt from './BuyDebt';
 import Transfer from './Transfer';
 import FeedValue from './FeedValue';
+import CDOStatus from './CDOStatus'
 import ResourceButtons from './ResourceButtons';
 import web3, { initWeb3 } from '../web3';
 import ReactNotify from '../notify';
@@ -149,6 +150,7 @@ class App extends Component {
           myBalance: web3.toBigNumber(0),
           totalSupply: web3.toBigNumber(0),
           address: "",
+          tableData: []
         },
         debtPurchaser:{
           address: "0x218fA415A0995A3b513694cf6c1460cBB6FdF90C"
@@ -757,17 +759,60 @@ class App extends Component {
     })
   )
 
+  getCDONoteName = (cdo) => (
+    new Promise((resolve, reject) => {
+      cdo.name.call((e, r) => {
+        resolve(r);
+      })
+    })
+  )
+
+  getCDOOutstanding = (cdo) => (
+    new Promise((resolve, reject) => {
+      cdo.outstanding.call((e, r) => {
+        resolve(r);
+      })
+    })
+  )
+
   getCDOUserBalance = (cdo, adr) => (
     new Promise((resolve, reject) => {
-      console.log("cdo: ", cdo, "adr: ", adr)
       cdo.balanceOf.call(adr, (e, r) => {
         resolve(r);
       })
     })
   )
 
+  getCDOInterestRate = (cdo) => (
+    new Promise((resolve, reject) => {
+      cdo.interest.call((e, r) => {
+        resolve(r);
+      })
+    })
+  )
+
+  getCDOExpirationDate = (cdo) => (
+    new Promise((resolve, reject) => {
+      cdo.date.call((e, r) => {
+        resolve(r);
+      })
+    })
+  )
+
+  getCDOPriceInDai = (cdo) => (
+    new Promise((resolve, reject) => {
+      this.bankDaiObj.cdoTokenPriceInDai.call(cdo.address, (e, r) => {
+        resolve(r);
+      })
+    })
+  )
+
   setCDODetails = () => {
-    let currentBalance = web3.toBigNumber(0), currentTotalSupply = web3.toBigNumber(0), currentCDO;
+    let currentBalance = web3.toBigNumber(0),
+        currentTotalSupply = web3.toBigNumber(0),
+        currentCDO,
+        cdoTableItem,
+        cdoTable = [];
     let cdoPromise = (cdoAddr) => (
       new Promise((resolve, reject) => {
         resolve(this.loadObject(cdoToken.abi, cdoAddr))
@@ -775,32 +820,59 @@ class App extends Component {
     )
     let resolveCDO = (idx) => {
       Promise
-        .resolve(this.getCDOAddress(idx))
+        .resolve(this.getCDOAddress(idx)) // Get CDO at cdoContractAddresses[idx] 
         .then(r => {
-          /* END CONDITION -- 0x means end of cdo address list! */
-          console.log("r: ", r)
-          if (r == '0x') {
+          if (r == '0x') { // END CONDITION -- 0x means end of cdo address list!
             let system = this.state.system;
             system.cdoToken.myBalance = currentBalance;
             system.cdoToken.totalSupply = currentTotalSupply;
-            console.log("totalSupply: ", system.cdoToken.totalSupply)
-            console.log("myBalance: ", system.cdoToken.myBalance)
+            system.cdoToken.tableData = cdoTable;
             this.setState({ system });
           } else {
+            cdoTableItem = {index: idx};
             Promise.resolve(cdoPromise(r))
-              .then(cdoObj => {
-                currentCDO = cdoObj;
-                return this.getCDOTotalSupply(currentCDO);
-              })
-              .then(totSupply => {
-                currentTotalSupply = currentTotalSupply.plus(totSupply);
-                console.log("totSupply:", totSupply)
-                return this.getCDOUserBalance(currentCDO, this.state.profile.activeProfile);
-              })
-              .then(usrBal => {
-                currentBalance = currentBalance.plus(usrBal);
-              })
-              .then(zzz => { resolveCDO(++idx) })
+                   .then(cdoObj => {
+                     currentCDO = cdoObj;
+                     return this.getCDONoteName(currentCDO);
+                   })
+                   .then(cdoName => {
+                     cdoTableItem.name = cdoName;
+                     return this.getCDOTotalSupply(currentCDO);
+                   })
+                   .then(totSupply => {
+                     currentTotalSupply = currentTotalSupply.plus(totSupply);
+                     cdoTableItem.totalSupply = totSupply;
+                     return this.getCDOOutstanding(currentCDO);
+                   })
+                   .then(outstanding => {
+                     cdoTableItem.outstanding = outstanding;
+                     return this.getCDOInterestRate(currentCDO);
+                   })
+                   .then(interest =>{
+                     cdoTableItem.interest = interest;
+                     return this.getCDOExpirationDate(currentCDO);
+                   })
+                   .then(expDate => {
+                     cdoTableItem.expDate = expDate;
+                     return this.getCDOPriceInDai(currentCDO);
+                   })
+                   .then(priceOfCDO => {
+                     console.log(priceOfCDO)
+                     cdoTableItem.price = priceOfCDO;
+                   })
+                   .then(whatever => {
+                     if (web3.isAddress(this.state.profile.activeProfile)) {
+                       return this.getCDOUserBalance(currentCDO, this.state.profile.activeProfile);
+                     } else { return 0 }
+                   })
+                   .then(usrBal => {
+                     cdoTableItem.myBalance = usrBal;
+                     currentBalance = currentBalance.plus(usrBal);
+                   })
+                   .then(zzz => {
+                     cdoTable.push(cdoTableItem)
+                     resolveCDO(++idx)
+                   })
           }
         })
     };
@@ -2668,18 +2740,18 @@ class App extends Component {
               <Token2 system={this.state.system} network={this.state.network.network} account={this.state.network.defaultAccount} token='cdoToken' color='bg-aqua' />
             </div>
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-9">
                 {
                   settings.chain[this.state.network.network].service && settings.chain[this.state.network.network].chart
                     ? <PriceChart chartData={this.state.system.chartData} />
                     : ''
                 }
-                <BankStatus system={this.state.system} actions={bustBoomActions} handleOpenModal={this.handleOpenModal} service={settings.chain[this.state.network.network].service} stats={this.state.system.stats} />
-              </div>
-              <div className="col-md-6">
-                <BankControls getTotalLiquidity={this.getTotalLiquidity} collectInterest={this.collectInterest} realizeCDOPaymentsAsThirdParty={this.realizeCDOPaymentsAsThirdParty}/>
-              </div>
-              <div className="col-md-12">
+                <BankStatus system={this.state.system}
+                            actions={bustBoomActions}
+                            handleOpenModal={this.handleOpenModal}
+                            service={settings.chain[this.state.network.network].service}
+                            stats={this.state.system.stats} />
+                <CDOStatus system={this.state.system} />
                 {
                   web3.isAddress(this.state.network.defaultAccount)
                     ?
@@ -2700,6 +2772,11 @@ class App extends Component {
                     :
                     ''
                 }
+              </div>
+              <div className="col-md-3">
+                <BankControls getTotalLiquidity={this.getTotalLiquidity}
+                              collectInterest={this.collectInterest}
+                              realizeCDOPaymentsAsThirdParty={this.realizeCDOPaymentsAsThirdParty}/>
               </div>
               <div className="col-md-3 right-sidebar">
                 {/* <div className="box">

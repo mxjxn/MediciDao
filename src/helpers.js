@@ -48,6 +48,11 @@ export function formatNumber(number, decimals = false, isWei = true) {
   return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (parts[1] ? `.${parts[1]}` : '');
 }
 
+export function formatSimpleDate(timestamp) {
+  const date = new Date(timestamp * 1000);
+  return `${date.getUTCDate()}-${date.getUTCMonth()}-${date.getUTCFullYear()}`
+}
+
 export function formatDate(timestamp) {
   const date = new Date(timestamp * 1000);
   return `${date.toDateString()} ${addZero(date.getHours())}:${addZero(date.getMinutes())}:${addZero(date.getSeconds())}`;
