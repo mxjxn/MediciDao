@@ -45,25 +45,26 @@
       "top": "0xAC23209256ad2f8FBF8719cf5a5047d557b6c88D",
       "fromBlock":  2547103,
       "BankDai": {
-        "address":"0xea8Cc5b7d09586edDfF9d1bcE24B15D1dfBF86e7",
-        "fromBlock":2574804
+        "address":"0x87b9b1eec19d6bf4abde8a32605fa7cf556d2b10",
+        "fromBlock": 2599451
       },
       "DSTokenBase":{
-        "address": "0x71464a0Ea3819DC1A5e64cFaea360DF4eED30a1D",
-        "fromBlock":2592461
+        "address": "0xce029fd7f625a23ff9f119c93dca2411df50ad1b",
+        "fromBlock": 2599478
       },
       "BankDaiToken":{
-        "address": "0x0DE1364714Cd8AD1Fe5c883b51bDb6D658fa6954",
-        "fromBlock":2592465
+        "address": "0x7ec2cea036fc17785acf23d5930e9b556f40788c",
+        "fromBlock": 2599459
       },
       "DaiCToken": {
-        "address": "0x68C65D7855D2FEF12418Ae97F0eA094814d70b2d",
-        "fromBlock": 2592473
+        "address": "0x1a61c90dcde821cccf7e2935c56a02de0e28f1b1",
+        "fromBlock": 2599455
       },
       "DebtPurchaser":{
-        "address": "0xF2a3e4Ded31CAA5c7dEA15D004527645CC5633F3",
-        "fromBlock": 2592482
+        "address": "0xBea6D8083dCcb7537CC45Fa7eC82d5C4874fFBd2",
+        "fromBlock": 2599497
       },
+
       "service": "",
       "chart": false,
       "proxyFactory": "",

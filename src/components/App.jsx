@@ -125,36 +125,30 @@ class App extends Component {
           address: null,
         },
         bankDai: {
-          address: -1,
           daiTokenApproved: -1,
           bankDaiTokenApproved: -1
         },
         daiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: -1,
           approvedAmount: -1
         },
         daiCToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: -1,
           approvedAmount: -1
         },
         bankDaiToken: {
           myBalance: web3.toBigNumber(-1),
           totalSupply: web3.toBigNumber(-1),
-          address: -1,
           approvedAmount: -1
         },
         cdoToken: {
           myBalance: web3.toBigNumber(0),
           totalSupply: web3.toBigNumber(0),
-          address: "",
           tableData: []
         },
         debtPurchaser:{
-          address: -1
         },
         tap: {
           address: null,
@@ -302,15 +296,7 @@ class App extends Component {
     networkState.latestBlock = 0;
     this.setState({ network: networkState }, () => {
       const addrs = settings.chain[this.state.network.network];
-      let system = {...this.state.system}
-      system.bankDai.address = addrs.BankDai.address;
-      system.daiToken.address = addrs.DSTokenBase.address;
-      system.bankDaiToken.address = addrs.BankDaiToken.address;
-      system.daiCToken.address = addrs.DaiCToken.address;
-      system.debtPurchaser.address = addrs.DebtPurchaser.address;
-      this.setState({system}, ()=>{
-        this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
-      })
+      this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
     });
   }
 
@@ -324,7 +310,8 @@ class App extends Component {
         web3.eth.defaultAccount = networkState.defaultAccount;
         this.setState({ network: networkState }, () => {
           if (checkAccountChange && oldDefaultAccount !== networkState.defaultAccount) {
-            this.initContracts(this.state.system.top.address);
+            const addrs = settings.chain[this.state.network.network];
+            this.initContracts(addrs.BankDai.address, addrs.DSTokenBase.address, addrs.BankDaiToken.address, addrs.DaiCToken.address, addrs.DebtPurchaser.address);
           }
         });
       }
@@ -389,13 +376,15 @@ class App extends Component {
   }
 
   getOutstandingDebt = () =>{
-    this.bankDaiObj.outstandingDebt(this.state.profile.activeProfile, (e,r)=>{
-      if(!e){
-        let profile = {...this.state.profile};
-        profile.outstandingDebt = r;
-        this.setState({profile});
-      }
-    })
+    if(web3.isAddress(this.state.profile.activeProfile)){
+      this.bankDaiObj.outstandingDebt(this.state.profile.activeProfile, (e,r)=>{
+        if(!e){
+          let profile = {...this.state.profile};
+          profile.outstandingDebt = r;
+          this.setState({profile});
+        }
+      })
+    }
   }
 
   initContracts = (bankDaiAddress, tokenAddress, bankTokenAddress, daiCTokenAddress, debtPurchaserAddress) => {
@@ -432,6 +421,7 @@ class App extends Component {
         this.getDaiCTokenTotalSupply();
         this.setTimeVariablesInterval();
         this.setNonTimeVariablesInterval();
+        this.getOutstandingDebt();
 
         // This is necessary to finish transactions that failed after signing
         this.setPendingTxInterval();
@@ -1321,33 +1311,7 @@ class App extends Component {
     this.getBankData('interestRate');
     this.getBankData('claimPeriod');
     this.getBankData('claimPeriodNumber');
-    this.getOutstandingDebt();
-    // this.getParameterFromTub('authority');
-    // this.getParameterFromTub('off');
-    // this.getParameterFromTub('out');
-    // this.getParameterFromTub('axe', true);
-    // this.getParameterFromTub('mat', true, this.calculateSafetyAndDeficit);
-    // this.getParameterFromTub('cap');
-    // this.getParameterFromTub('fit');
-    // this.getParameterFromTub('tax', true);
-    // this.getParameterFromTub('fee', true);
-    // this.getParameterFromTub('chi', true);
-    // this.getParameterFromTub('rhi', true);
-    // this.getParameterFromTub('per', true);
-    // this.getParameterFromTub('gap');
-    // this.getParameterFromTub('tag', true, this.calculateSafetyAndDeficit);
-    // this.getParameterFromTap('fix', true);
-    // this.getParameterFromTap('gap', false, this.getBoomBustValues);
-    // this.getParameterFromVox('way', true);
-    // this.getParameterFromVox('par', true);
-    // this.loadEraRho();
     this.getAccountBalance();
-    // if (settings.chain[this.state.network.network].service) {
-    //   if (settings.chain[this.state.network.network].chart) {
-    //     this.getChartData();
-    //   }
-    //   this.getStats();
-    // }
   }
 
   calculateSafetyAndDeficit = () => {
@@ -2359,7 +2323,8 @@ class App extends Component {
       //     `${this.methodSig(`deposit(address,uint256)`)}${addressToBytes32(this.gemObj.address, false)}${toBytes32(web3.toWei(amount), false)}`,
       //     log);
       // } else {
-      this.daiTokenObj.approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+      console.log("depositing. bankDai address is:", settings.chain[this.state.network.network].BankDai.address)
+      this.daiTokenObj.approve(settings.chain[this.state.network.network].BankDai.address, web3.toWei(amount), (e, tx) => {
         if (!e) {
           // alert(tx)
           this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
@@ -2377,7 +2342,7 @@ class App extends Component {
       //     `${this.methodSig(`withdraw(address,uint256)`)}${addressToBytes32(this.gemObj.address, false)}${toBytes32(web3.toWei(amount), false)}`,
       //     log);
       // } else {
-      this.bankDaiTokenObj.approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+      this.bankDaiTokenObj.approve(settings.chain[this.state.network.network].BankDai.address, web3.toWei(amount), (e, tx) => {
         if (!e) {
           // alert(tx)
           this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
@@ -2413,7 +2378,7 @@ class App extends Component {
 
     if (operation === 'repay') {
       this.logRequestTransaction(approveId, approveTitle);
-      this[`${token}Obj`].approve(this.state.system.bankDai.address, web3.toWei(amount), (e, tx) => {
+      this[`${token}Obj`].approve(settings.chain[this.state.network.network].BankDai.address, web3.toWei(amount), (e, tx) => {
         if (!e) {
           // alert(tx)
           this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
@@ -2464,7 +2429,7 @@ class App extends Component {
     }
 
     this.logRequestTransaction(approveId, approveTitle);
-    this[`${token}Obj`].approve(this.state.system.debtPurchaser.address, web3.toWei(amount), (e, tx) => {
+    this[`${token}Obj`].approve(settings.chain[this.state.network.network].DebtPurchaser.address, web3.toWei(amount), (e, tx) => {
       if (!e) {
         // alert(tx)
         this.logPendingTransaction(approveId, tx, approveTitle, [['setUpToken', 'bankDaiToken'], ['getAccountBalance']]);
@@ -2744,10 +2709,10 @@ class App extends Component {
             <div className="row">
               <div className="col-md-12">
                 <GeneralInfo
-                  dai={this.state.system.daiToken.address}
-                  bankDai={this.state.system.bankDai.address}
-                  bankDaiToken={this.state.system.bankDaiToken.address}
-                  daiCToken={this.state.system.daiCToken.address}
+                  dai={settings.chain[this.state.network.network].DSTokenBase.address}
+                  bankDai={settings.chain[this.state.network.network].BankDai.address}
+                  bankDaiToken={settings.chain[this.state.network.network].BankDaiToken.address}
+                  daiCToken={settings.chain[this.state.network.network].DaiCToken.address}
                   network={this.state.network.network}
                   account={this.state.network.defaultAccount}
                   proxy={this.state.profile.proxy}
